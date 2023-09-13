@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'Customers',
     'Items',
+    'Orders',
 
     'rest_framework'
 ]
