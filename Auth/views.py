@@ -34,7 +34,7 @@ class LoginAPIView(APIView):
         try:
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
-                return JsonResponse({"status":status.HTTP_200_OK, "message": "Log In Successful!", "results": serializer.data})
+                return JsonResponse({"status":status.HTTP_200_OK, "message": "Log In Successful!"})
             else:
                 return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": serializer.errors})
         except Exception as e:

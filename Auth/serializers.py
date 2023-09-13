@@ -37,22 +37,15 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('A password is required to log in.')
 
         user = authenticate(username=username, password=password)
-        refresh = RefreshToken.for_user(user=user)
+        RefreshToken.for_user(user=user)
 
         if user is None:
             raise serializers.ValidationError('A user with this username and password was not found.')
 
         if not user.is_active:
             raise serializers.ValidationError('This user has been deactivated.')
-
-        return {
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
-            'refresh': refresh, 
-            'access': refresh.access_token
-        }
+        
+        return user
 
 class LogoutSerializer(serializers.Serializer):
     """Serializers registration requests and logs out an existing User."""
