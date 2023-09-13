@@ -32,9 +32,7 @@ class LoginAPIView(APIView):
     def post(self, request: Request) -> JsonResponse:
         """Return user after login."""
         try:
-            user = request.data.get('user', {})
-
-            serializer = self.serializer_class(data=user)
+            serializer = self.serializer_class(data=request.data)
             if serializer.is_valid():
                 return JsonResponse({"status":status.HTTP_200_OK, "message": "Log In Successful!", "results": serializer.data})
             else:
