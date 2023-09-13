@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'Customers',
     'Items',
     'Orders',
+    'Auth',
 
     'rest_framework',
     'rest_framework.authtoken'
