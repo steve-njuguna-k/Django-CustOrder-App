@@ -24,7 +24,7 @@ class OrderAPIView(APIView):
         except Exception as e:
             return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})
 
-    def get(self, request, pk):
+    def get(self, request, pk=None):
         """GET request function to either retrieve a given Order object or list all Orders objects"""
 
         if pk:
@@ -50,7 +50,7 @@ class OrderAPIView(APIView):
             except Exception as e:
                 return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})
 
-    def patch(self, request, pk):
+    def patch(self, request, pk=None):
         """PATCH request function to update a given Order object"""
 
         try:
@@ -64,7 +64,7 @@ class OrderAPIView(APIView):
         except Exception as e:
             return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})
         
-    def delete(self, pk):
+    def delete(self, pk=None):
         """DELETE request function to delete a given Order object"""
 
         try:
