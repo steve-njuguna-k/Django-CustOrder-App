@@ -1,0 +1,12 @@
+version: '3'
+services:
+  custorder_web:
+    build: .
+    volumes:
+      - .:/django-custorder-app
+    ports:
+      - 9000:9000
+    image: app:django
+    restart: always
+    container_name: custorder_app
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:9000"
