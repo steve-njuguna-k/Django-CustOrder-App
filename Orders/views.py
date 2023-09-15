@@ -1,3 +1,4 @@
+from Customers.models import Customer
 from .models import Order
 from .serializers import OrderSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -5,6 +6,8 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from core.services import send_sms
+from Items.models import Item
 
 #Order API View
 class OrderAPIView(APIView):
@@ -18,7 +21,17 @@ class OrderAPIView(APIView):
             serializer = self.serializer_class(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return JsonResponse({"status":status.HTTP_201_CREATED, "message": "Order Created Successfully!", "results": serializer.data})
+
+                customer = Customer.objects.get(id=serializer.data['customer'])
+                
+                send_sms(
+                    "{} {}".format(serializer.data['customer_first_name'], serializer.data['customer_last_name']), 
+                    serializer.data['item_name'], 
+                    serializer.data['quantity'], 
+                    serializer.data['total'],
+                    customer.phone_number
+                    )
+                return JsonResponse({"status":status.HTTP_201_CREATED, "message": "Order Created Successfully! An SMS has been sent to the customer for delivery", "results": serializer.data})
             else:
                 return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": serializer.errors})
         except Exception as e:
