@@ -3,7 +3,6 @@ from Customers.views import CustomerAPIView
 from Items.views import ItemAPIView
 from Orders.views import OrderAPIView
 from Auth.views import RegistrationAPIView, LoginAPIView, LogoutAPIView
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 urlpatterns = [
     path('v1/login', LoginAPIView.as_view(), name='login_user'),
@@ -18,7 +17,4 @@ urlpatterns = [
 
     path('v1/orders', OrderAPIView.as_view(), name="list_create_orders"),
     path('v1/orders/<int:pk>', OrderAPIView.as_view(), name="update_delete_orders"),
-
-    path('v1/token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('v1/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]

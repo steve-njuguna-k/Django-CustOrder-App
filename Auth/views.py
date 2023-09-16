@@ -4,8 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from .serializers import (LoginSerializer, RegistrationSerializer, LogoutSerializer)
-from rest_framework_simplejwt.tokens import OutstandingToken, BlacklistedToken
+from .serializers import (LoginSerializer, RegistrationSerializer)
 from rest_framework import status
 
 # Create your views here.
@@ -48,30 +47,12 @@ class LoginAPIView(APIView):
             return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})
         
 class LogoutAPIView(APIView):
-    serializer_class = LogoutSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         """Return user after login."""
         try:
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            LogoutAllView.as_view()(request=request._request)
+            request.data.auth_token.delete()
             return JsonResponse({"status":status.HTTP_204_NO_CONTENT, "message": "You have logged out!",})
-        except Exception as e:
-            return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})
-        
-class LogoutAllView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        """Logs you out of all systems a user had logged in"""
-        try:
-            tokens = OutstandingToken.objects.filter(user_id=request.user.id)
-            for token in tokens:
-                BlacklistedToken.objects.get_or_create(token=token)
-
-            return JsonResponse({"status":status.HTTP_205_RESET_CONTENT, "message": "Logged Out From All Devices Successfully!"})
         except Exception as e:
             return JsonResponse({"status":status.HTTP_400_BAD_REQUEST, "message": "An Error Occured!", "results": {"error": str(e)}})

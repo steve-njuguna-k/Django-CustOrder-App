@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.authtoken.models import Token
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new User."""
@@ -37,7 +37,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('A password is required to log in.')
 
         user = authenticate(username=username, password=password)
-        RefreshToken.for_user(user=user)
+        token, _ = Token.objects.get_or_create(user=user)
 
         if user is None:
             raise serializers.ValidationError('A user with this username and password was not found.')
@@ -45,23 +45,4 @@ class LoginSerializer(serializers.Serializer):
         if not user.is_active:
             raise serializers.ValidationError('This user has been deactivated.')
         
-        return user
-
-class LogoutSerializer(serializers.Serializer):
-    """Serializers registration requests and logs out an existing User."""
-
-    refresh = serializers.CharField()
-
-    default_error_message = {
-        'invalid_token': ('This Token is either expired or invalid.')
-    }
-
-    def validate(self, attrs):
-        self.token = attrs['refresh']
-        return attrs
-
-    def save(self, **kwargs):
-        try:
-            RefreshToken(self.token).blacklist()
-        except TokenError:
-            self.fail('invalid_token')
+        return token
