@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'Orders',
     'Auth',
 
+    'oauth2_provider',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
@@ -68,7 +69,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,10 +137,30 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_URL='/admin/login/'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+OAUTH2_PROVIDER = {
+    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 120,
+    "OIDC_ENABLED": True,
+    "OIDC_RP_INITIATED_LOGOUT_ENABLED": True,
+    "OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT": True,
+    "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
+    "SCOPES": {
+        "openid": "OpenID Connect scope",
+        'read': 'Read scope',
+        'write': 'Write scope',
+    },
 }
 
 SIMPLE_JWT = {

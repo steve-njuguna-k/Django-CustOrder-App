@@ -9,6 +9,13 @@ from rest_framework_simplejwt.tokens import OutstandingToken, BlacklistedToken
 from rest_framework import status
 
 # Create your views here.
+def oauth_openid_callback(request):
+    code = request.GET['code']
+    params = {
+        "code": code
+    }
+    return JsonResponse({"status":status.HTTP_200_OK, "message": "Authorization Code Generated Successfully!", "results": params})
+
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistrationSerializer
