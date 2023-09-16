@@ -158,8 +158,6 @@ OAUTH2_PROVIDER = {
     "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
     "SCOPES": {
         "openid": "OpenID Connect scope",
-        'read': 'Read scope',
-        'write': 'Write scope',
     },
 }
 

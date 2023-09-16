@@ -5,11 +5,13 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from oauth2_provider.contrib.rest_framework import TokenHasScope
 
 #Item API View
 class ItemAPIView(APIView):
     serializer_class = ItemSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated, TokenHasScope]
+    required_scopes = ['openid']
 
     def post(self, request):
         """POST request function to create a new Item object"""

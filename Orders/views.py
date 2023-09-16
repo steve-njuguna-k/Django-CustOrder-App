@@ -7,12 +7,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from core.services import send_sms
-from Items.models import Item
+from oauth2_provider.contrib.rest_framework import TokenHasScope
 
 #Order API View
 class OrderAPIView(APIView):
     serializer_class = OrderSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated, TokenHasScope]
+    required_scopes = ['openid']
 
     def post(self, request):
         """POST request function to create a new Order object"""
