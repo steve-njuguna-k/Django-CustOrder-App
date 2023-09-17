@@ -1,9 +1,8 @@
-from datetime import timedelta
 import json
 from urllib.parse import parse_qs, urlparse
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from oauth2_provider.models import get_application_model, Grant
+from oauth2_provider.models import get_application_model
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 import random
