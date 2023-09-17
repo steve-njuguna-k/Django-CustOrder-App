@@ -1,12 +1,28 @@
+# Define the version of Docker Compose configuration
 version: '3'
+
+# Define the services (containers) for your application
 services:
   custorder_web:
+    # Build the container using the current directory (where Dockerfile is located)
     build: .
+
+    # Mount the current directory to the /django-custorder-app directory inside the container
     volumes:
       - .:/django-custorder-app
+
+    # Expose port 9000 on the host and map it to port 9000 in the container
     ports:
       - 9000:9000
+
+    # Specify the name of the Docker image for this service
     image: app:django
+
+    # Restart the container automatically if it stops
     restart: always
+
+    # Assign a custom name to the container
     container_name: custorder_app
+
+    # Define the command to run inside the container when it starts
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:9000"
