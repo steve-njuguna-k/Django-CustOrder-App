@@ -111,7 +111,7 @@ class CustomerTestCase(TestCase):
         self.access_token = token_info.get("access_token")
         self.assertIsNotNone(self.access_token)
 
-        self.authenticated_user = self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
     
     def test_create_customer(self):
         # Define the data for the new customer
