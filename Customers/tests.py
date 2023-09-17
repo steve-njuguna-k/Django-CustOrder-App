@@ -122,7 +122,7 @@ class CustomerTestCase(TestCase):
         }
 
         # Send a POST request to create a new customer
-        response = self.client.post(f'/api/v1/customers', data)
+        response = self.client.post('/api/v1/customers', data)
         response_info = json.loads(response.content)
 
         # Check if the request was successful (HTTP status code 201 - Created)
