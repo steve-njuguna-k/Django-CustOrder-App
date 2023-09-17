@@ -10,48 +10,52 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+# Import necessary modules
 import os
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
+# Load environment variables from a .env file if available
 load_dotenv(find_dotenv())
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Define the base directory for the project
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: Keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: Don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG')
 
+# List of allowed hostnames for this Django application
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split()
 
-
-# Application definition
-
+# Define the installed apps for the Django project
 INSTALLED_APPS = [
+    # Django Core Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    
+    # Your Custom Apps
     'Customers',
     'Items',
     'Orders',
     'Auth',
-
+    
+    # Third-party Apps
     'oauth2_provider',
     'rest_framework',
     'rest_framework.authtoken',
 ]
 
+# Define middleware for handling requests and responses
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,8 +66,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Define the root URL configuration for the project
 ROOT_URLCONF = 'core.urls'
 
+# Configure templates for rendering HTML content
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -80,12 +86,10 @@ TEMPLATES = [
     },
 ]
 
+# Define the WSGI application for the project
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -93,10 +97,7 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -112,41 +113,32 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
+# Internationalization settings
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Africa/Nairobi'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
+# Static files (CSS, JavaScript, Images) settings
 STATIC_URL = 'static/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL='/admin/login/'
+# Define the login URL for the admin panel
+LOGIN_URL = '/admin/login/'
 
+# REST framework settings for authentication and permissions
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
-
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
 }
 
+# OAuth2 provider settings
 OAUTH2_PROVIDER = {
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 300,
     "OIDC_ENABLED": True,
@@ -157,11 +149,3 @@ OAUTH2_PROVIDER = {
         "openid": "OpenID Connect scope",
     },
 }
-
-JENKINS_TASKS = (
-    'django_jenkins.tasks.run_pep8',
-    'django_jenkins.tasks.run_pyflakes',
-    'django_jenkins.tasks.run_jslint',
-    'django_jenkins.tasks.run_csslint',
-    'django_jenkins.tasks.run_sloccount'
-)
