@@ -150,6 +150,26 @@ class CustomerTestCase(TestCase):
         self.assertEqual(response_info['results']['first_name'], 'Jesicca')
         self.assertEqual(response_info['results']['last_name'], 'Pearson')
         self.assertEqual(response_info['results']['phone_number'], '0711223344')
+    
+    def test_list_customers(self):
+        # Create customers in bulk
+        Customer.objects.bulk_create([
+            Customer(first_name='Jesicca', last_name='Knowles',phone_number='0711223344'),
+            Customer(first_name='Moses', last_name='Green',phone_number='0723443521'),
+            Customer(first_name='Alice', last_name='Bianca',phone_number='0733444555'),
+            Customer(first_name='Brian', last_name='Taylor',phone_number='0701761401'),
+            Customer(first_name='Melly', last_name='Crove',phone_number='0723002365'),
+        ])
+
+        # Send a GET request to retrieve the customer details
+        response = self.client.get(f'/api/v1/customers')
+        response_info = json.loads(response.content)
+
+        # Check if the request was successful (HTTP status code 200 - OK)
+        self.assertEqual(response_info['status'], 200)
+
+        # Check if the response contains the expected number of customers
+        self.assertEqual(len(response_info['results']), 5)
 
     def test_update_customer(self):
         # Create a test customer
