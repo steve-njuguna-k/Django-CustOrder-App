@@ -206,6 +206,44 @@ class ItemTestCase(TestCase):
         self.assertEqual(response_info['results']['item'], item.id)
         self.assertEqual(response_info['results']['quantity'], 2)
 
+    def test_list_orders(self):
+        # Create customers in bulk
+        Customer.objects.bulk_create([
+            Customer(first_name='Jesicca', last_name='Knowles',phone_number='0711223344'),
+            Customer(first_name='Moses', last_name='Green',phone_number='0723443521'),
+            Customer(first_name='Alice', last_name='Bianca',phone_number='0733444555'),
+            Customer(first_name='Brian', last_name='Taylor',phone_number='0701761401'),
+            Customer(first_name='Melly', last_name='Crove',phone_number='0723002365'),
+        ])
+
+        # Create items in bulk
+        Item.objects.bulk_create([
+            Item(name='Shorts', size='L', price='29.99'),
+            Item(name='Vest', size='S', price='9.99'),
+            Item(name='Shoes', size='M', price='49.99'),
+            Item(name='Khai', size='XL', price='79.99'),
+            Item(name='Jeans', size='XXL', price='59.99'),
+        ])
+
+        # Create orders in bulk
+        Order.objects.bulk_create([
+            Order(customer_id=1, item_id=1, quantity=1),
+            Order(customer_id=2, item_id=2, quantity=2),
+            Order(customer_id=3, item_id=3, quantity=3),
+            Order(customer_id=4, item_id=4, quantity=4),
+            Order(customer_id=5, item_id=5, quantity=5),
+        ])
+
+        # Send a GET request to retrieve the customer details
+        response = self.client.get(f'/api/v1/orders')
+        response_info = json.loads(response.content)
+
+        # Check if the request was successful (HTTP status code 200 - OK)
+        self.assertEqual(response_info['status'], 200)
+
+        # Check if the response contains the expected number of items
+        self.assertEqual(len(response_info['results']), 5)
+
     def test_update_order(self):
         # Create a test order
         customer = Customer.objects.create(
