@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: Don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = os.environ.get('DEBUG', False) == 'True'
 
 # List of allowed hostnames for this Django application
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split()
@@ -89,7 +89,6 @@ TEMPLATES = [
 # Define the WSGI application for the project
 WSGI_APPLICATION = 'core.wsgi.application'
 
-  
 # Database configuration
 DATABASES = {
     "default": {
