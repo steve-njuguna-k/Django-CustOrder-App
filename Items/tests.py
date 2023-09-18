@@ -151,6 +151,26 @@ class ItemTestCase(TestCase):
         self.assertEqual(response_info['results']['name'], 'Shorts')
         self.assertEqual(response_info['results']['size'], 'L')
         self.assertEqual(response_info['results']['price'], '29.99')
+    
+    def test_list_items(self):
+        # Create items in bulk    
+        Item.objects.bulk_create([
+            Item(name='Shorts', size='L', price='29.99'),
+            Item(name='Vest', size='S', price='9.99'),
+            Item(name='Shoes', size='M', price='49.99'),
+            Item(name='Khai', size='XL', price='79.99'),
+            Item(name='Jeans', size='XXL', price='59.99'),
+        ])
+
+        # Send a GET request to retrieve the customer details
+        response = self.client.get(f'/api/v1/items')
+        response_info = json.loads(response.content)
+
+        # Check if the request was successful (HTTP status code 200 - OK)
+        self.assertEqual(response_info['status'], 200)
+
+        # Check if the response contains the expected number of items
+        self.assertEqual(len(response_info['results']), 5)
 
     def test_update_item(self):
         # Create a test item
