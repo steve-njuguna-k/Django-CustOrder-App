@@ -11,6 +11,7 @@ import base64
 import hashlib
 import secrets
 from .models import Customer
+from rest_framework import status
 
 Application = get_application_model()
 
@@ -130,6 +131,24 @@ class CustomerTestCase(TestCase):
 
         # Check if the customer was created in the database
         self.assertTrue(Customer.objects.filter(first_name='Steve').exists())
+    
+    def test_create_customer_with_validation_error(self):
+        # Attempt to create a customer with invalid data (e.g., missing required fields)
+        data = {
+            # Missing 'first_name' field
+            'last_name': 'Perez',
+            'phone_number': '0724567890',
+        }
+
+        # Send a POST request to create the customer
+        response = self.client.post('/api/v1/customers', data)
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('first_name' not in response_info['results'])
 
     def test_read_customer(self):
         # Create a test customer
@@ -171,6 +190,24 @@ class CustomerTestCase(TestCase):
         # Check if the response contains the expected number of customers
         self.assertEqual(len(response_info['results']), 5)
 
+    def test_list_customer_details_with_unexpected_exception(self):
+        # Create a test customer
+        customer = Customer.objects.create(
+            first_name='Bridget',
+            last_name='Michael',
+            phone_number='0754123456-',
+        )
+
+        # Simulate an unexpected exception by manipulating the customer ID
+        invalid_customer_id = customer.id + 1000  # An invalid customer ID
+
+        # Send a GET request to retrieve the details of a customer with an invalid ID
+        response = self.client.get(f'/api/v1/customers/{invalid_customer_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
     def test_update_customer(self):
         # Create a test customer
         customer = Customer.objects.create(
@@ -199,6 +236,56 @@ class CustomerTestCase(TestCase):
         self.assertEqual(customer.last_name, 'Litt')
         self.assertEqual(customer.phone_number, '0722333444')
 
+    def test_update_customer_with_validation_error(self):
+        # Create a test customer
+        customer = Customer.objects.create(
+            first_name='John',
+            last_name='Crown',
+            phone_number='0755123456',
+        )
+
+        # Attempt to edit the customer with invalid data (e.g., missing required fields)
+        invalid_data = {
+            'first_name': '',
+            'last_name': 'Crown',
+            'phone_number': '0753125678',
+        }
+
+        # Send a PUT request to edit the customer with invalid data
+        response = self.client.patch(f'/api/v1/customers/{customer.id}', invalid_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('first_name' not in response_info['results'])
+    
+    def test_update_customer_with_unexpected_exception(self):
+        # Create a test customer
+        customer = Customer.objects.create(
+            first_name='James',
+            last_name='Flemings',
+            phone_number='0722876543',
+        )
+
+        # Simulate an unexpected exception by manipulating the customer ID
+        invalid_customer_id = customer.id + 1000  # An invalid customer ID
+
+        # Attempt to edit the customer with an invalid ID
+        updated_data = {
+            'first_name': 'Jeremy',
+            'last_name': 'Ward',
+            'phone_number': '0733456098',
+        }
+
+        # Send a PUT request to edit the customer with an invalid ID
+        response = self.client.patch(f'/api/v1/customers/{invalid_customer_id}', updated_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
     def test_delete_customer(self):
         # Create a test customer
         customer = Customer.objects.create(
@@ -216,3 +303,24 @@ class CustomerTestCase(TestCase):
 
         # Check if the customer was deleted from the database
         self.assertFalse(Customer.objects.filter(id=customer.id).exists())
+    
+    def test_delete_customer_with_unexpected_exception(self):
+        # Create a test customer
+        customer = Customer.objects.create(
+            first_name='Janet',
+            last_name='More',
+            phone_number='0711757239',
+        )
+
+        # Simulate an unexpected exception by manipulating the customer ID
+        invalid_customer_id = customer.id + 1000  # An invalid customer ID
+
+        # Send a DELETE request to delete the customer with an invalid ID
+        response = self.client.delete(f'/api/v1/customers/{invalid_customer_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Optionally, check if the response contains an error message or details
+        self.assertTrue('detail' not in response_info['results'])
