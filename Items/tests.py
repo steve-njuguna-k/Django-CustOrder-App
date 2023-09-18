@@ -12,6 +12,7 @@ import base64
 import hashlib
 import secrets
 from .models import Item
+from rest_framework import status
 
 Application = get_application_model()
 
@@ -131,6 +132,24 @@ class ItemTestCase(TestCase):
 
         # Check if the item was created in the database
         self.assertTrue(Item.objects.filter(name='Sneakers').exists())
+    
+    def test_create_item_with_validation_error(self):
+        # Attempt to create a item with invalid data (e.g., missing required fields)
+        data = {
+            # Missing 'name' field
+            'size': 'L',
+            'price': '29.99'
+        }
+
+        # Send a POST request to create the item
+        response = self.client.post('/api/v1/items', data)
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('name' not in response_info['results'])
 
     def test_read_item(self):
         # Create a test item
@@ -162,7 +181,7 @@ class ItemTestCase(TestCase):
             Item(name='Jeans', size='XXL', price='59.99'),
         ])
 
-        # Send a GET request to retrieve the customer details
+        # Send a GET request to retrieve the item details
         response = self.client.get(f'/api/v1/items')
         response_info = json.loads(response.content)
 
@@ -171,6 +190,24 @@ class ItemTestCase(TestCase):
 
         # Check if the response contains the expected number of items
         self.assertEqual(len(response_info['results']), 5)
+
+    def test_list_item_details_with_unexpected_exception(self):
+        # Create a test item
+        item = Item.objects.create(
+            name='Crocs',
+            size='M',
+            price='19.99'
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_item_id = item.id + 1000  # An invalid item ID
+
+        # Send a GET request to retrieve the details of a item with an invalid ID
+        response = self.client.get(f'/api/v1/items/{invalid_item_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
 
     def test_update_item(self):
         # Create a test item
@@ -199,6 +236,56 @@ class ItemTestCase(TestCase):
         self.assertEqual(item.name, 'Khaki')
         self.assertEqual(item.size, 'XL')
         self.assertEqual(item.price, Decimal('39.99'))
+    
+    def test_update_item_with_validation_error(self):
+        # Create a test item
+        item = Item.objects.create(
+            name='Jeans',
+            size='S',
+            price='9.99'
+        )
+
+        # Attempt to edit the item with invalid data (e.g., missing required fields)
+        invalid_data = {
+            'name': 'Khaki',
+            'size': '',
+            'price': '39.99'
+        }
+
+        # Send a PUT request to edit the item with invalid data
+        response = self.client.patch(f'/api/v1/items/{item.id}', invalid_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('first_name' not in response_info['results'])
+    
+    def test_update_item_with_unexpected_exception(self):
+        # Create a test item
+        item = Item.objects.create(
+            name='Jeans',
+            size='S',
+            price='9.99'
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_item_id = item.id + 1000  # An invalid item ID
+
+        # Attempt to edit the item with an invalid ID
+        updated_data = {
+            'name': 'Suit',
+            'size': 'S',
+            'price': '99.99'
+        }
+
+        # Send a PUT request to edit the item with an invalid ID
+        response = self.client.patch(f'/api/v1/items/{invalid_item_id}', updated_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
 
     def test_delete_item(self):
         # Create a test item
@@ -217,3 +304,21 @@ class ItemTestCase(TestCase):
 
         # Check if the item was deleted from the database
         self.assertFalse(Item.objects.filter(id=item.id).exists())
+
+    def test_delete_item_with_unexpected_exception(self):
+        # Create a test item
+        item = Item.objects.create(
+            name='Sneakers',
+            size='M',
+            price='19.99'
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_item_id = item.id + 1000  # An invalid item ID
+
+        # Send a DELETE request to delete the item with an invalid ID
+        response = self.client.delete(f'/api/v1/items/{invalid_item_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
