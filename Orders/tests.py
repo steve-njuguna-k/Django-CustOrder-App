@@ -17,6 +17,7 @@ from Items.models import Item
 from dotenv import load_dotenv
 import phonenumbers
 import africastalking as at
+from rest_framework import status
 
 # Load environment variables from .env file
 load_dotenv()
@@ -176,6 +177,31 @@ class ItemTestCase(TestCase):
         # Check if the sms response was successful (HTTP status code 101 - Success)
         self.assertEqual(response['SMSMessageData']['Recipients'][0]['statusCode'], 101)
 
+    def test_create_item_with_validation_error(self):
+        # Attempt to create a item with invalid data (e.g., missing required fields)
+        item = Item.objects.create(
+            name='Sneakers',
+            size='M',
+            price='19.99'
+        )
+
+        # Define the data for the new order
+        data = {
+            # Missing 'customer' field
+            'item': item.id,
+            'quantity': 3,
+        }
+
+        # Send a POST request to create the item
+        response = self.client.post('/api/v1/orders', data)
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('name' not in response_info['results'])
+
     def test_read_order(self):
         # Create a test order
         customer = Customer.objects.create(
@@ -241,8 +267,36 @@ class ItemTestCase(TestCase):
         # Check if the request was successful (HTTP status code 200 - OK)
         self.assertEqual(response_info['status'], 200)
 
-        # Check if the response contains the expected number of items
+        # Check if the response contains the expected number of orders
         self.assertEqual(len(response_info['results']), 5)
+
+    def test_list_item_details_with_unexpected_exception(self):
+        # Create a test item
+        customer = Customer.objects.create(
+            first_name='Jane',
+            last_name='Flin',
+            phone_number='0733567123'
+        )
+        item = Item.objects.create(
+            name='Sweater',
+            size='L',
+            price='29.99'
+        )
+        order = Order.objects.create(
+            customer=customer,
+            item=item,
+            quantity=2,
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_order_id = order.id + 1000  # An invalid item ID
+
+        # Send a GET request to retrieve the details of a item with an invalid ID
+        response = self.client.get(f'/api/v1/orders/{invalid_order_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
 
     def test_update_order(self):
         # Create a test order
@@ -280,6 +334,76 @@ class ItemTestCase(TestCase):
         order.refresh_from_db()
         self.assertEqual(order.quantity, 5)
 
+    def test_update_item_with_validation_error(self):
+        # Create a test item
+        customer = Customer.objects.create(
+            first_name='Alice',
+            last_name='Blue',
+            phone_number='0711670236'
+        )
+        item = Item.objects.create(
+            name='Gloves',
+            size='S',
+            price='9.99'
+        )
+        order = Order.objects.create(
+            customer=customer,
+            item=item,
+            quantity=1,
+        )
+
+        # Attempt to edit the item with invalid data (e.g., missing required fields)
+        invalid_data = {
+            'customer': customer.id,
+            'item': item.id,
+            'quantity': '',
+        }
+
+        # Send a PUT request to edit the item with invalid data
+        response = self.client.patch(f'/api/v1/orders/{order.id}', invalid_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
+        # Check if the response contains error details
+        self.assertTrue('first_name' not in response_info['results'])
+    
+    def test_update_item_with_unexpected_exception(self):
+        # Create a test item
+        customer = Customer.objects.create(
+            first_name='Alice',
+            last_name='Blue',
+            phone_number='0711670236'
+        )
+        item = Item.objects.create(
+            name='Gloves',
+            size='S',
+            price='9.99'
+        )
+        order = Order.objects.create(
+            customer=customer,
+            item=item,
+            quantity=1,
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_order_id = order.id + 1000  # An invalid item ID
+
+        # Attempt to edit the item with an invalid ID
+        updated_data = {
+            'name': 'Suit',
+            'size': 'S',
+            'price': '99.99'
+        }
+
+        # Send a PUT request to edit the item with an invalid ID
+        response = self.client.patch(f'/api/v1/orders/{invalid_order_id}', updated_data, format='json')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in a validation error (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
+
     def test_delete_order(self):
         # Create a test order
         customer = Customer.objects.create(
@@ -307,3 +431,31 @@ class ItemTestCase(TestCase):
 
         # Check if the order was deleted from the database
         self.assertFalse(Order.objects.filter(id=order.id).exists())
+
+    def test_delete_item_with_unexpected_exception(self):
+        # Create a test item
+        customer = Customer.objects.create(
+            first_name='Bob',
+            last_name='White',
+            phone_number='0714034167'
+        )
+        item = Item.objects.create(
+            name='Sneakers',
+            size='M',
+            price='19.99'
+        )
+        order = Order.objects.create(
+            customer=customer,
+            item=item,
+            quantity=3,
+        )
+
+        # Simulate an unexpected exception by manipulating the item ID
+        invalid_order_id = order.id + 1000  # An invalid item ID
+
+        # Send a DELETE request to delete the item with an invalid ID
+        response = self.client.delete(f'/api/v1/orders/{invalid_order_id}')
+        response_info = json.loads(response.content)
+
+        # Check if the request results in an error response (HTTP status code 400 - Bad Request)
+        self.assertEqual(response_info['status'], status.HTTP_400_BAD_REQUEST)
