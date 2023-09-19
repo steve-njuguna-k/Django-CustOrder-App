@@ -234,30 +234,24 @@ class ItemTestCase(TestCase):
 
     def test_list_orders(self):
         # Create customers in bulk
-        Customer.objects.bulk_create([
-            Customer(first_name='Jesicca', last_name='Knowles',phone_number='0711223344'),
-            Customer(first_name='Moses', last_name='Green',phone_number='0723443521'),
-            Customer(first_name='Alice', last_name='Bianca',phone_number='0733444555'),
-            Customer(first_name='Brian', last_name='Taylor',phone_number='0701761401'),
-            Customer(first_name='Melly', last_name='Crove',phone_number='0723002365'),
-        ])
-
-        # Create items in bulk
-        Item.objects.bulk_create([
-            Item(name='Shorts', size='L', price='29.99'),
-            Item(name='Vest', size='S', price='9.99'),
-            Item(name='Shoes', size='M', price='49.99'),
-            Item(name='Khai', size='XL', price='79.99'),
-            Item(name='Jeans', size='XXL', price='59.99'),
-        ])
+        customer = Customer.objects.create(
+            first_name='Michael',
+            last_name='Fling',
+            phone_number='0733567123'
+        )
+        item = Item.objects.create(
+            name='Sweater',
+            size='L',
+            price='29.99'
+        )
 
         # Create orders in bulk
         Order.objects.bulk_create([
-            Order(customer_id=1, item_id=1, quantity=1),
-            Order(customer_id=2, item_id=2, quantity=2),
-            Order(customer_id=3, item_id=3, quantity=3),
-            Order(customer_id=4, item_id=4, quantity=4),
-            Order(customer_id=5, item_id=5, quantity=5),
+            Order(customer=customer, item=item, quantity=1),
+            Order(customer=customer, item=item, quantity=2),
+            Order(customer=customer, item=item, quantity=3),
+            Order(customer=customer, item=item, quantity=4),
+            Order(customer=customer, item=item, quantity=5),
         ])
 
         # Send a GET request to retrieve the customer details
