@@ -141,12 +141,11 @@ jobs:
             aws configure set default.region $AWS_DEFAULT_REGION
 
             # Deploy the CloudFormation stack
-            aws cloudformation create-stack \
-              --stack-name $STACK_NAME \
-              --template-body .circleci/files/cloudformation_template.yml \
-              --parameters \
-                ParameterKey=InstanceType,ParameterValue=t2.micro \
-              --capabilities CAPABILITY_IAM
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudformation_template.yml \
+              --tags project=$STACK_NAME \
+              --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
 
       - run:
           name: Wait for Stack Creation

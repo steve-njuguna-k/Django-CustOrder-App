@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: '2010-09-09'
 Description: Template for creating an Amazon VPC and EC2 instance for CustOrder App
 
 # Define AWS CloudFormation resources to create the VPC and EC2 instance
