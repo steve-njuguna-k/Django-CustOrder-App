@@ -4,11 +4,6 @@ jobs:
   build:
     docker:
       - image: cimg/python:3.10  # Specify the Python version using a Docker image
-      - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
-        environment:
-          POSTGRES_USER: ${DB_USER}
-          POSTGRES_PASSWORD: ${DB_PASSWORD}
-          POSTGRES_DB: ${DB_NAME}
 
     steps:
       - checkout  # Checkout your code repository
