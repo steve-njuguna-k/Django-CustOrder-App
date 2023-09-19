@@ -15,9 +15,6 @@ services:
     ports:
       - 9000:9000
 
-    # Specify the name of the Docker image for this service
-    image: app:django
-
     # Restart the container automatically if it stops
     restart: always
 
