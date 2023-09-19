@@ -28,6 +28,10 @@ services:
     depends_on:
       - db
 
+    # Specify the location of the environment variables
+    env_file:
+    - .env
+
   db:
     # Use the PostgreSQL 10 image based on Alpine Linux
     image: postgres:16
