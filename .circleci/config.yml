@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            python manage.py test  # Run Django tests
+            python manage.py test
 
   coverage:
     docker:
