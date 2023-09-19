@@ -1,0 +1,67 @@
+version: 2.1  # CircleCI configuration version
+
+jobs:
+  build:
+    docker:
+      - image: python:3.10.2-slim-bullseye  # Specify the Python version using a Docker image
+      - image: circleci/postgres:16  # Use an appropriate PostgreSQL version with required environment variables
+        environment:
+          POSTGRES_USER: ${DB_USER}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+          POSTGRES_DB: ${DB_NAME}
+
+    steps:
+      - checkout  # Checkout your code repository
+
+      # Restore the cached Python packages to speed up dependency installation
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt  # Install project dependencies
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.cache/pip  # Cache the Python packages for future builds
+
+      - run:
+          name: Run tests
+          command: |
+            python manage.py test  # Run Django tests
+
+  coverage:
+    docker:
+      - image: python:3.10.2-slim-bullseye  # Specify the Python version for coverage reporting
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt  # Install dependencies for coverage
+
+      - run:
+          name: Run coverage
+          command: |
+            coverage run manage.py test
+            coverage xml
+
+      - save_cache:
+          key: v1-coverage-{{ checksum "requirements.txt" }}
+          paths:
+            - .coverage  # Cache coverage data for future reference
+
+workflows:
+  version: 2  # Define a workflow for the CI/CD pipeline
+
+  build-test:
+    jobs:
+      - build  # Run the 'build' job for building and testing
+      - coverage:
+          requires:
+            - build  # Require the 'build' job to complete before running coverage

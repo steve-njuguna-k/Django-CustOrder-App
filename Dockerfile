@@ -1,4 +1,4 @@
-# Use an official Python 3.9.6 image from the Alpine Linux distribution as the base image
+# Use an official Python 3.10.2-slim-bullseye image from the Alpine Linux distribution as the base image
 FROM python:3.10.2-slim-bullseye
 
 # Set environment variables to ensure Python does not write bytecode files (.pyc) and runs in unbuffered mode
