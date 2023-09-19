@@ -76,7 +76,7 @@ jobs:
 
       - run:
           name: Build Docker image
-          command: docker build -t $IMAGE_NAME .
+          command: docker build --tag $IMAGE_NAME .
           # Build a Docker image using the specified IMAGE_NAME
 
       - run:
