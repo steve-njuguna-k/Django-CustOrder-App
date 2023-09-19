@@ -35,6 +35,12 @@ jobs:
   coverage:
     docker:
       - image: cimg/python:3.10  # Specify the Python version for coverage reporting
+      - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          
     steps:
       - checkout
       - restore_cache:
