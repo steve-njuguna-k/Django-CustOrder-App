@@ -146,13 +146,6 @@ jobs:
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-
-      - run:
-          name: Get EC2 Instance ID
-          command: |
-            # Retrieve the EC2 instance ID from the CloudFormation stack outputs
-            instance_id=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
-            echo "EC2 Instance ID: $instance_id"
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
