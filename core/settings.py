@@ -14,6 +14,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 # Load environment variables from a .env file if available
 load_dotenv(find_dotenv())
@@ -145,13 +148,16 @@ REST_FRAMEWORK = {
     )
 }
 
+PRIVATE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=4096, backend=default_backend())
+OIDC_RSA_PRIVATE_KEY  = PRIVATE_KEY.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.TraditionalOpenSSL, encryption_algorithm=serialization.NoEncryption()).decode("utf-8")
+
 # OAuth2 provider settings
 OAUTH2_PROVIDER = {
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 300,
     "OIDC_ENABLED": True,
     "OIDC_RP_INITIATED_LOGOUT_ENABLED": True,
     "OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT": True,
-    "OIDC_RSA_PRIVATE_KEY": os.environ.get("OIDC_RSA_PRIVATE_KEY"),
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
     "SCOPES": {
         "openid": "OpenID Connect scope",
     },
