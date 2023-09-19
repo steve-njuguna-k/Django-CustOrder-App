@@ -82,9 +82,8 @@ jobs:
       - run:
           name: Push to DockerHub
           command: |
-            # Authenticate with Docker Hub using the provided credentials
-            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
-            
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+                        
             # Push the built image to Docker Hub with the 'latest' tag
             docker push $IMAGE_NAME:latest
 
