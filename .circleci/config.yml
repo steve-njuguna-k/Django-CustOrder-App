@@ -1,6 +1,40 @@
-version: 2.1  # CircleCI configuration version
+# CircleCI configuration version
+version: 2.1
 
+# Define custom commands that can be used in jobs
+commands:
+
+  # Install AWS CLI v2
+  install_awscli:
+    description: Install AWS CLI v2
+    steps:
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            # Download and install AWS CLI v2
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  # Destroy cloudformation stacks given a workflow ID
+  destroy-environment:
+    description: Destroy cloudformation stacks given a workflow ID.
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail  # Run only on job failure
+          command: |
+            # Delete a CloudFormation stack using the specified Workflow ID
+            aws cloudformation delete-stack --stack-name $STACK_NAME-<< parameters.Workflow_ID >>
+
+# Define individual jobs that can be executed in the workflow
 jobs:
+
+  # Build and test job
   build-test:
     docker:
       - image: cimg/python:3.10  # Specify the Python version using a Docker image
@@ -13,7 +47,6 @@ jobs:
     steps:
       - checkout  # Checkout your code repository
 
-      # Restore the cached Python packages to speed up dependency installation
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
@@ -32,6 +65,7 @@ jobs:
           command: |
             python manage.py test
 
+  # Test coverage job
   test-coverage:
     docker:
       - image: cimg/python:3.10  # Specify the Python version for coverage reporting
@@ -40,7 +74,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-          
+
     steps:
       - checkout
       - restore_cache:
@@ -62,6 +96,7 @@ jobs:
           paths:
             - .coverage  # Cache coverage data for future reference
 
+  # Push to Docker Hub job
   push-to-dockerhub:
     docker:
       - image: cimg/python:3.10  # Specify the Python version for coverage reporting
@@ -70,7 +105,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-            
+
     steps:
       - checkout # Step to check out the source code
       - setup_remote_docker
@@ -84,12 +119,53 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-            # Push the built image to Docker Hub with the 'latest' tag
+            # Tag and push the built image to Docker Hub with the 'latest' tag
             docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME
             docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
+  # Deploy EC2 instance job
+  deploy-ec2-instance:
+    docker:
+      - image: cimg/base:stable
+
+    steps:
+      - checkout  # Checkout your code
+      - install_awscli
+
+      - run:
+          name: Deploy CloudFormation Stack
+          command: |
+            # Configure AWS CLI with your AWS credentials
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set default.region $AWS_DEFAULT_REGION
+
+            # Deploy the CloudFormation stack
+            aws cloudformation create-stack \
+              --stack-name $STACK_NAME \
+              --template-body .circleci/files/cloudformation_template.yml \
+              --parameters \
+                ParameterKey=InstanceType,ParameterValue=t2.micro \
+              --capabilities CAPABILITY_IAM
+
+      - run:
+          name: Wait for Stack Creation
+          command: |
+            # Wait for the CloudFormation stack to be created
+            aws cloudformation wait stack-create-complete --stack-name $STACK_NAME
+
+      - run:
+          name: Get EC2 Instance ID
+          command: |
+            # Retrieve the EC2 instance ID from the CloudFormation stack outputs
+            instance_id=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
+            echo "EC2 Instance ID: $instance_id"
+      
+      - destroy-environment  # Run the destroy-environment command to delete resources
+
+# Define the workflow for the CI/CD pipeline
 workflows:
-  version: 2  # Define a workflow for the CI/CD pipeline
+  version: 2
 
   build-test:
     jobs:
@@ -99,4 +175,7 @@ workflows:
             - build-test  # Require the 'build-test' job to complete before running coverage
       - push-to-dockerhub:
           requires:
-            - test-coverage  # Require the 'test-coverage' job to complete before running dockerhub
+            - test-coverage  # Require the 'test-coverage' job to complete before pushing to Docker Hub
+      - deploy-ec2-instance:
+          requires:
+            - push-to-dockerhub  # Require the 'push-to-dockerhub' job to complete before deploying the EC2 instance

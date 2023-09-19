@@ -1,0 +1,60 @@
+Description: Template for creating an Amazon VPC and EC2 instance for CustOrder App
+
+# Define AWS CloudFormation resources to create the VPC and EC2 instance
+Resources:
+  # Create the VPC
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  # Create an Internet Gateway and attach it to the VPC
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Create a security group for EC2 instance
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9000
+          ToPort: 9000
+          CidrIp: 0.0.0.0/0
+
+  # Create a private subnet within the VPC
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.0.0/24
+
+  # Create an EC2 instance within the private subnet
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      SubnetId: !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      ImageId: ami-053b0d53c279acc90
+
+# Define Outputs to retrieve information about the created resources
+Outputs:
+  # Output the ID of the created EC2 instance
+  EC2InstanceId:
+    Description: ID of the created EC2 instance
+    Value: !Ref MyEC2Instance
