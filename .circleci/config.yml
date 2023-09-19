@@ -148,12 +148,6 @@ jobs:
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
 
       - run:
-          name: Wait for Stack Creation
-          command: |
-            # Wait for the CloudFormation stack to be created
-            aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[].StackStatus' --output text
-
-      - run:
           name: Get EC2 Instance ID
           command: |
             # Retrieve the EC2 instance ID from the CloudFormation stack outputs
