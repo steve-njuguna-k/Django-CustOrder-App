@@ -1,7 +1,7 @@
 version: 2.1  # CircleCI configuration version
 
 jobs:
-  build:
+  build-test:
     docker:
       - image: cimg/python:3.10  # Specify the Python version using a Docker image
       - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
@@ -32,7 +32,7 @@ jobs:
           command: |
             python manage.py test
 
-  coverage:
+  test-coverage:
     docker:
       - image: cimg/python:3.10  # Specify the Python version for coverage reporting
       - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
@@ -62,7 +62,7 @@ jobs:
           paths:
             - .coverage  # Cache coverage data for future reference
 
-  dockerhub:
+  push-to-dockerhub:
     docker:
       - image: cimg/python:3.10  # Specify the Python version for coverage reporting
       - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
@@ -76,7 +76,7 @@ jobs:
 
       - run:
           name: Build Docker image
-          command: docker build --tag $IMAGE_NAME .
+          command: docker build -t $IMAGE_NAME .
           # Build a Docker image using the specified IMAGE_NAME
 
       - run:
@@ -93,10 +93,10 @@ workflows:
 
   build-test:
     jobs:
-      - build  # Run the 'build' job for building and testing
-      - coverage:
+      - build-test  # Run the 'build-test' job for building and testing
+      - test-coverage:
           requires:
-            - build  # Require the 'build' job to complete before running coverage
-      - dockerhub:
+            - build-test  # Require the 'build-test' job to complete before running coverage
+      - push-to-dockerhub:
           requires:
-            - coverage  # Require the 'coverage' job to complete before running dockerhub
+            - test-coverage  # Require the 'test-coverage' job to complete before running dockerhub
