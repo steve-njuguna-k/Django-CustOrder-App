@@ -62,6 +62,26 @@ jobs:
           paths:
             - .coverage  # Cache coverage data for future reference
 
+  dockerhub:
+    executor: docker-publisher # Use the 'docker-publisher' executor for this job
+      
+    steps:
+      - checkout # Step to check out the source code
+      
+      - setup_remote_docker # Step to set up a remote Docker environment for building and pushing images
+
+      - run:
+          name: Publish Docker Image to Docker Hub
+          command: |
+            # Authenticate with Docker Hub using the provided credentials
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" — password-stdin
+            
+            # Build a Docker image using the specified IMAGE_NAME
+            docker build -t $IMAGE_NAME .
+            
+            # Push the built image to Docker Hub with the 'latest' tag
+            docker push $IMAGE_NAME:latest
+
 workflows:
   version: 2  # Define a workflow for the CI/CD pipeline
 
@@ -71,3 +91,6 @@ workflows:
       - coverage:
           requires:
             - build  # Require the 'build' job to complete before running coverage
+      - dockerhub:
+          requires:
+            - coverage  # Require the 'coverage' job to complete before running dockerhub
