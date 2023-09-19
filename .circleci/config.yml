@@ -3,8 +3,8 @@ version: 2.1  # CircleCI configuration version
 jobs:
   build:
     docker:
-      - image: python:3.10.2-slim-bullseye  # Specify the Python version using a Docker image
-      - image: circleci/postgres:16  # Use an appropriate PostgreSQL version with required environment variables
+      - image: cimg/python:3.10  # Specify the Python version using a Docker image
+      - image: cimg/postgres:14.0  # Use an appropriate PostgreSQL version with required environment variables
         environment:
           POSTGRES_USER: ${DB_USER}
           POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -34,7 +34,7 @@ jobs:
 
   coverage:
     docker:
-      - image: python:3.10.2-slim-bullseye  # Specify the Python version for coverage reporting
+      - image: cimg/python:3.10  # Specify the Python version for coverage reporting
     steps:
       - checkout
       - restore_cache:
