@@ -151,7 +151,7 @@ jobs:
           name: Wait for Stack Creation
           command: |
             # Wait for the CloudFormation stack to be created
-            aws cloudformation wait stack-create-complete --stack-name $STACK_NAME
+            aws cloudformation describe-stacks --stack-name $STACK_NAME --query 'Stacks[].StackStatus' --output text
 
       - run:
           name: Get EC2 Instance ID
