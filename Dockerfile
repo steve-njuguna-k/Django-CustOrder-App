@@ -5,6 +5,10 @@ FROM python:3.10.2-slim-bullseye
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+ENV POSTGRES_USER=${DB_USER} \
+    POSTGRES_PASSWORD=${DB_PASSWORD} \
+    POSTGRES_DB=${DB_NAME}
+
 # Set the working directory inside the container to /app
 WORKDIR /app
 
