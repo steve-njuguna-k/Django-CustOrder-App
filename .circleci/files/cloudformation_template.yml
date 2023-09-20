@@ -81,13 +81,6 @@ Resources:
       Tags:
         - Key: Name
           Value: CustOrder-Server
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: 'true'
-          DeleteOnTermination: 'true'
-          DeviceIndex: '0'
-          GroupSet:
-            - !Ref InstanceSecurityGroup
-          SubnetId: !Ref PublicSubnet
 
 # Define Outputs to retrieve information about the created resources
 Outputs:
