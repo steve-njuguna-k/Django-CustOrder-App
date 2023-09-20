@@ -185,7 +185,7 @@ jobs:
             AWS_REGION=$AWS_DEFAULT_REGION
 
             # 3- Get SG ID# TODO Don't forget to replace by your own SG ID
-            SG_ID=#SG_ID
+            SG_ID=$SG_ID
 
             # 4- SSH to the server to deploy
             echo "Setting up SSH..."
