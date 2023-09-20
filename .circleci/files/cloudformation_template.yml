@@ -11,9 +11,14 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
+  # Specifies an Elastic IP (EIP) address
+  MyEIP:
+    Type: "AWS::EC2::EIP"
+
   # Create an Internet Gateway and attach it to the VPC
   InternetGateway:
     Type: AWS::EC2::InternetGateway
+    
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -81,6 +86,13 @@ Resources:
       Tags:
         - Key: Name
           Value: CustOrder-Server
+  
+  # Associate the Elastic IP (EIP) address with an EC2 instance
+  EIPAssociation:
+    Type: "AWS::EC2::EIPAssociation"
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+      EIP: !Ref MyEIP
 
 # Define Outputs to retrieve information about the created resources
 Outputs:
