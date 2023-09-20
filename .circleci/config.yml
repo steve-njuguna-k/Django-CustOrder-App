@@ -120,7 +120,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker image
-          command: docker-compose -f docker-compose.yml build --tag $IMAGE_NAME .
+          command: docker build -t $IMAGE_NAME .
           # Build a Docker image using the specified IMAGE_NAME
 
       - run:
@@ -167,6 +167,32 @@ jobs:
             echo "Username: $USERNAME"
       
       - destroy-environment  # Run the destroy-environment command to delete resources
+  
+  run-docker-image-on-ec2:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - checkout
+      - run:
+          name: Deploy
+          command: |
+            # 1- Install AWS CLI
+            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            ./awscli-bundle/install -b ~/bin/aws
+
+            # 2- Get the public IP of the current CircleCI runner
+            PUBLIC_IP=$(curl ipinfo.io/ip)
+            echo "PUBLIC_IP: $PUBLIC_IP"
+
+            # 3- Get AWS Region# TODO Don't forget to replcae by your own Region
+            AWS_REGION=$AWS_DEFAULT_REGION
+
+            # 4- Get SG ID# TODO Don't forget to replace by your own SG ID
+            SG_ID=#SG_ID
+
+            # 7- SSH to the server to deploy
+            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS \
 
 # Define the workflow for the CI/CD pipeline
 workflows:
