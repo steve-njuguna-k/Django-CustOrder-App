@@ -104,7 +104,7 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
       ImageId: ami-053b0d53c279acc90
-      KeyName: SteveKeyPair
+      KeyName: COKeyPair
       Tags:
         - Key: Name
           Value: CustOrder-Server
