@@ -156,6 +156,13 @@ jobs:
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       
+      - run:
+          name: Get Stack Info
+          command: |
+            # Retrieve the EC2 instance ID from the CloudFormation stack outputs
+            stack_details=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0]" --output text)
+            echo "Stack Info: $stack_details"
+      
       - destroy-environment  # Run the destroy-environment command to delete resources
 
 # Define the workflow for the CI/CD pipeline
