@@ -3,12 +3,6 @@ Description: Template for creating an Amazon VPC and EC2 instance for CustOrder 
 
 # Define AWS CloudFormation resources to create the VPC and EC2 instance
 Resources:
-  # Create the Key Pair
-  CustOrderKeyPair:
-    Type: 'AWS::EC2::KeyPair'
-    Properties:
-      KeyName: MyKeyPair
-
   # Create the VPC
   MyVPC:
     Type: AWS::EC2::VPC
@@ -110,7 +104,7 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
       ImageId: ami-053b0d53c279acc90
-      KeyName: !Ref CustOrderKeyPair
+      KeyName: SteveKeyPair
       Tags:
         - Key: Name
           Value: CustOrder-Server
