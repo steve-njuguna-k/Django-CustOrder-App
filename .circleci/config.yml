@@ -160,8 +160,25 @@ jobs:
           name: Get Stack Info
           command: |
             # Retrieve the EC2 instance ID from the CloudFormation stack outputs
-            stack_details=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0]" --output text)
-            echo "Stack Info: $stack_details"
+            STACK_INFO=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0]" --output text)
+            echo "Stack Info: $STACK_INFO"
+      
+      - run:
+            name: Get EC2 Instance Info
+            command: |
+              # Retrieve the instance ID from CloudFormation outputs
+              INSTANCE_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[0].OutputValue" --output text)
+
+              # Describe the instance to get the public IP and username
+              INSTANCE_INFO=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0]")
+
+              # Extract username and IP
+              INSTANCE_USERNAME=$(echo $INSTANCE_INFO | jq -r ".KeyName")
+              INSTANCE_IP=$(echo $INSTANCE_INFO | jq -r ".PublicIpAddress")
+
+              # Print the information
+              echo "Instance Username: $INSTANCE_USERNAME"
+              echo "Instance IP: $INSTANCE_IP"
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
