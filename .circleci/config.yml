@@ -155,30 +155,16 @@ jobs:
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            
-      - run:
-          name: Wait for Stack Completion
-          command: |
-            # Wait for the stack to complete
-            echo "Waiting for CloudFormation stack $STACK_NAME to complete..."
-            while true; do
-              stack_status=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].StackStatus" --output text --region $AWS_DEFAULT_REGION)
 
-              case "$stack_status" in
-                CREATE_COMPLETE|UPDATE_COMPLETE)
-                  echo "Stack creation/update completed successfully."
-                  break
-                  ;;
-                CREATE_FAILED|ROLLBACK_COMPLETE|ROLLBACK_FAILED|DELETE_COMPLETE|DELETE_FAILED|UPDATE_ROLLBACK_COMPLETE|UPDATE_ROLLBACK_FAILED)
-                  echo "Stack creation/update failed with status: $stack_status"
-                  exit 1
-                  ;;
-                *)
-                  echo "Stack status: $stack_status. Waiting for completion..."
-                  sleep 30  # Adjust the sleep interval as needed
-                  ;;
-              esac
-            done
+      - run:
+          name: Get EC2 instance information
+          command: |
+            INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=CustOrder-Server" --query "Reservations[0].Instances[0].InstanceId" --output text)
+            PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+            USERNAME=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].KeyName" --output text)
+            echo "Instance ID: $INSTANCE_ID"
+            echo "Public IP: $PUBLIC_IP"
+            echo "Username: $USERNAME"
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
