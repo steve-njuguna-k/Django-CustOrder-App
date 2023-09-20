@@ -170,28 +170,24 @@ jobs:
   
   run-docker-image-on-ec2:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/base:stable
     steps:
-      - checkout
+      - checkout  # Checkout your code
+      - install_awscli
       - run:
           name: Deploy
           command: |
-            # 1- Install AWS CLI
-            curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-            unzip awscli-bundle.zip
-            ./awscli-bundle/install -b ~/bin/aws
-
-            # 2- Get the public IP of the current CircleCI runner
+            # 1- Get the public IP of the current CircleCI runner
             PUBLIC_IP=$(curl ipinfo.io/ip)
             echo "PUBLIC_IP: $PUBLIC_IP"
 
-            # 3- Get AWS Region# TODO Don't forget to replcae by your own Region
+            # 2- Get AWS Region# TODO Don't forget to replcae by your own Region
             AWS_REGION=$AWS_DEFAULT_REGION
 
-            # 4- Get SG ID# TODO Don't forget to replace by your own SG ID
+            # 3- Get SG ID# TODO Don't forget to replace by your own SG ID
             SG_ID=#SG_ID
 
-            # 7- SSH to the server to deploy
+            # 4- SSH to the server to deploy
             ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS \
 
 # Define the workflow for the CI/CD pipeline

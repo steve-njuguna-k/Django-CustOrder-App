@@ -35,18 +35,44 @@ Resources:
           FromPort: 9000
           ToPort: 9000
           CidrIp: 0.0.0.0/0
+  
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key: Name
+          Value: !Sub CustOrder Public Subnet (AZ1)
+      VpcId: !Ref MyVPC
 
   # Create a private subnet within the VPC
   PrivateSubnet:
     Type: AWS::EC2::Subnet
-    Properties:
+    Properties: 
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      Tags: 
+        - Key: Name
+          Value: !Sub CustOrder Private Subnet (AZ1)
       VpcId: !Ref MyVPC
-      CidrBlock: 10.0.0.0/24
 
   # Create an EC2 instance within the private subnet
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt install unzip
+          sudo snap install docker
+          mkdir App
+          wget https://github.com/steve-njuguna-k/Django-CustOrder-App/archive/refs/heads/master.zip -P App/
+          sudo unzip App/master.zip
+          rm -rf App/master.zip
+          
       InstanceType: t3.micro
       SubnetId: !Ref PrivateSubnet
       SecurityGroupIds:
@@ -55,6 +81,13 @@ Resources:
       Tags:
         - Key: Name
           Value: CustOrder-Server
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeleteOnTermination: 'true'
+          DeviceIndex: '0'
+          GroupSet:
+            - !Ref InstanceSecurityGroup
+          SubnetId: !Ref PublicSubnet
 
 # Define Outputs to retrieve information about the created resources
 Outputs:

@@ -1,0 +1,62 @@
+# Define the version of Docker Compose configuration
+version: '3'
+
+# Define the services (containers) for your application
+services:
+  custorder_web:
+    # Build the container using the current directory (where Dockerfile is located)
+    build: .
+
+    # Mount the current directory to the /app directory inside the container
+    volumes:
+      - .:/app
+
+    # Expose port 9000 on the host and map it to port 9000 in the container
+    ports:
+      - 9000:9000
+
+    # Restart the container automatically if it stops
+    restart: always
+
+    # Assign a custom name to the container
+    container_name: custorder_app
+
+    # Define the command to run inside the container when it starts
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py createsuperuser && python manage.py runserver 0.0.0.0:9000"
+
+    # Define that this service depends on the 'db' service, which ensures proper initialization order
+    depends_on:
+      - db
+
+    # Specify the location of the environment variables
+    env_file:
+    - .env
+
+  db:
+    # Use the PostgreSQL 10 image based on Alpine Linux
+    image: postgres:16
+
+    # Specify a custom name for the PostgreSQL container
+    container_name: custorder_db
+
+    # Restart the container automatically if it stops
+    restart: always
+
+    # Set environment variables for PostgreSQL (user, password, database name)
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+    # Expose port 5432 on the host and map it to port 5432 in the container
+    ports:
+      - "5432:5432"
+
+    # Mount a volume to persist PostgreSQL data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+# Define named volumes for data persistence
+volumes:
+  web-django:
+  postgres_data:
