@@ -1,124 +1,171 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Template for creating an Amazon VPC and EC2 instance for CustOrder App
+# This AWS CloudFormation template is written in YAML format.
+AWSTemplateFormatVersion: 2010-09-09
 
-# Define AWS CloudFormation resources to create the VPC and EC2 instance
+# Define AWS resources
 Resources:
-  # Create the VPC
-  MyVPC:
+
+  # Create a Virtual Private Cloud (VPC)
+  Vpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
-      EnableDnsHostnames: true
-
-  # Specifies an Elastic IP (EIP) address
-  MyEIP:
-    Type: "AWS::EC2::EIP"
+      EnableDnsHostnames: false
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: CO
 
   # Create an Internet Gateway and attach it to the VPC
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    
+    Properties:
+      Tags:
+        - Key: Name
+          Value: CO
+
+  # Attach the Internet Gateway to the VPC
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
 
-  # Create a security group for EC2 instance
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  # Create a public route table for the VPC
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
     Properties:
-      GroupDescription: Allow SSH access
-      VpcId: !Ref MyVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 9000
-          ToPort: 9000
-          CidrIp: 0.0.0.0/0
-  
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
-    Properties: 
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
-      CidrBlock: 10.0.0.0/24
-      MapPublicIpOnLaunch: true
-      Tags: 
-        - Key: Name
-          Value: !Sub CustOrder Public Subnet (AZ1)
-      VpcId: !Ref MyVPC
-
-  # Create a private subnet within the VPC
-  PrivateSubnet:
-    Type: AWS::EC2::Subnet
-    Properties: 
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
-      CidrBlock: 10.0.2.0/24
-      MapPublicIpOnLaunch: false
-      Tags: 
-        - Key: Name
-          Value: !Sub CustOrder Private Subnet (AZ1)
-      VpcId: !Ref MyVPC
-
-  # Create an EC2 instance within the private subnet
-  MyEC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          export SECRET_KEY=$SECRET_KEY
-          export DEBUG=$DEBUG
-          export ALLOWED_HOSTS=$ALLOWED_HOSTS
-          export AT_API_KEY=$AT_API_KEY
-          export AT_USERNAME=$AT_USERNAME
-          export DB_ENGINE=$DB_ENGINE
-          export DB_NAME=$DB_NAME
-          export DB_USER=$DB_USER
-          export DB_PASSWORD=$DB_PASSWORD
-          export DB_HOST=$DB_HOST
-          export DB_PORT=$DB_PORT
-          export DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME
-          export DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL
-          export DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD
-          export DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME
-          export DOCKERHUB_PASS=$DOCKERHUB_PASS
-
-          sudo apt install unzip
-          sudo snap install docker
-          mkdir App
-          wget https://github.com/steve-njuguna-k/Django-CustOrder-App/archive/refs/heads/master.zip -P App/
-          sudo unzip App/master.zip
-          rm -rf App/master.zip
-
-          cd App/Django-CustOrder-App-master
-          sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
-          sudo docker-compose -f docker-compose-prod.yml up -d --build
-          
-      InstanceType: t3.micro
-      SubnetId: !Ref PrivateSubnet
-      SecurityGroupIds:
-        - !Ref InstanceSecurityGroup
-      ImageId: ami-053b0d53c279acc90
-      KeyName: COKeyPair
+      VpcId: !Ref Vpc
       Tags:
         - Key: Name
-          Value: CustOrder-Server
-  
-  # Associate the Elastic IP (EIP) address with an EC2 instance
-  EIPAssociation:
-    Type: "AWS::EC2::EIPAssociation"
-    Properties:
-      InstanceId: !Ref MyEC2Instance
-      EIP: !Ref MyEIP
+          Value: CO | Public
 
-# Define Outputs to retrieve information about the created resources
+  # Create a default route in the public route table for Internet access
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  # Create a subnet for the database server with public IP assignment
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: CO-Server
+
+  # Associate the database subnet with the public route table
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref Subnet
+
+  # Create a security group for the database server to control inbound traffic
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: MySQL security group
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 9000
+          ToPort: 9000
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+      Tags:
+        - Key: Name
+          Value: CO-Server
+
+  # Create an EC2 instance for the database server
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: COKeyPair
+      ImageId: ami-0261755bbcb8c4a84
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !GetAtt SecurityGroup.GroupId
+      SubnetId: !Ref Subnet
+
+      # User data script to configure the instance on launch
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo -i
+
+          # Define your environment variables
+          SECRET_KEY="fl6nfoi3=_z5ejry5=e&rx0y2_hmb4$odrm3gxs$ehp0-__hxm"
+          DEBUG="False"
+          ALLOWED_HOSTS="localhost 127.0.0.1 [::1]"
+          AT_API_KEY="4934dafb85459e3f454c963349fa814af2599d467d21e50a1f2cd56a7ca92da5"
+          AT_USERNAME="sandbox"
+          AT_SMS_SHORTCODE="3393"
+          DB_ENGINE="django.db.backends.postgresql"
+          DB_NAME="postgres"
+          DB_USER="postgres"
+          DB_PASSWORD="postgres"
+          DB_HOST="db"
+          DB_PORT="5432"
+          DJANGO_SUPERUSER_USERNAME="admin"
+          DJANGO_SUPERUSER_EMAIL="admin@example.com"
+          DJANGO_SUPERUSER_PASSWORD="admin12345"
+          DOCKERHUB_USERNAME="stevenjugunakamau"
+          DOCKERHUB_PASS="stevenjugunakamau"
+
+          # Append environment variable exports
+          echo "SECRET_KEY=$SECRET_KEY" >> /etc/environment
+          echo "DEBUG=$DEBUG" >> /etc/environment
+          echo "ALLOWED_HOSTS=$ALLOWED_HOSTS" >> /etc/environment
+          echo "AT_API_KEY=$AT_API_KEY" >> /etc/environment
+          echo "AT_USERNAME=$AT_USERNAME" >> /etc/environment
+          echo "AT_SMS_SHORTCODE=$AT_SMS_SHORTCODE" >> /etc/environment
+          echo "DB_ENGINE=$DB_ENGINE" >> /etc/environment
+          echo "DB_NAME=$DB_NAME" >> /etc/environment
+          echo "DB_USER=$DB_USER" >> /etc/environment
+          echo "DB_PASSWORD=$DB_PASSWORD" >> /etc/environment
+          echo "DB_HOST=$DB_HOST" >> /etc/environment
+          echo "DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME" >> /etc/environment
+          echo "DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL" >> /etc/environment
+          echo "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" >> /etc/environment
+          echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" >> /etc/environment
+          echo "DOCKERHUB_PASS=$DOCKERHUB_PASS" >> /etc/environment
+
+          # Install necessary packages and set up the application
+          source /etc/environment
+
+          apt install unzip
+          snap install docker
+          systemctl enable docker
+          mkdir App
+
+          # Download and extract the application code from GitHub
+          wget https://github.com/steve-njuguna-k/Django-CustOrder-App/archive/refs/heads/master.zip -P App/
+          cd App/
+          unzip master.zip
+          rm -rf master.zip
+
+          # Navigate to the application directory and start Docker services
+          cd Django-CustOrder-App-master/
+          docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
+          docker-compose -f docker-compose-prod.yml up -d --build
+
+      Tags:
+        - Key: Name
+          Value: CO-Server
+
+# Define outputs for the CloudFormation stack
 Outputs:
-  # Output the ID of the created EC2 instance
-  EC2InstanceId:
-    Description: ID of the created EC2 instance
-    Value: !Ref MyEC2Instance
+
+  # Output the public IP address of the database EC2 instance
+  PublicIP:
+    Description: Public IP address of the database EC2 instance
+    Value: !GetAtt Instance.PublicIp
