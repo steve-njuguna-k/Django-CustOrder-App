@@ -210,3 +210,6 @@ workflows:
       - deploy-ec2-instance:
           requires:
             - push-to-dockerhub  # Require the 'push-to-dockerhub' job to complete before deploying the EC2 instance
+      - run-docker-image-on-ec2:
+          requires:
+            - deploy-ec2-instance  # Require the 'deploy-ec2-instance' job to complete before deploying the EC2 instance
