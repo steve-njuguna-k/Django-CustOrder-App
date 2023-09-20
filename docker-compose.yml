@@ -4,12 +4,13 @@ version: '3'
 # Define the services (containers) for your application
 services:
   custorder_web:
-    # Build the container using the current directory (where Dockerfile is located)
-    build: .
+    # # Build the container using the current directory (where Dockerfile is located)
+    # build: .
 
-    # Mount the current directory to the /app directory inside the container
-    volumes:
-      - .:/app
+    # # Mount the current directory to the /app directory inside the container
+    # volumes:
+    #   - .:/app
+    image: stevenjugunakamau/custorderapp:latest
 
     # Expose port 9000 on the host and map it to port 9000 in the container
     ports:
@@ -28,7 +29,7 @@ services:
     depends_on:
       - db
 
-    # Specify the location of the environment variables
+    # # Specify the location of the environment variables
     env_file:
     - .env
 

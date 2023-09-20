@@ -155,30 +155,30 @@ jobs:
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-      
+            
       - run:
-          name: Get Stack Info
+          name: Wait for Stack Completion
           command: |
-            # Retrieve the EC2 instance ID from the CloudFormation stack outputs
-            STACK_INFO=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0]" --output text)
-            echo "Stack Info: $STACK_INFO"
-      
-      - run:
-            name: Get EC2 Instance Info
-            command: |
-              # Retrieve the instance ID from CloudFormation outputs
-              INSTANCE_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[0].OutputValue" --output text)
+            # Wait for the stack to complete
+            echo "Waiting for CloudFormation stack $STACK_NAME to complete..."
+            while true; do
+              stack_status=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].StackStatus" --output text --region $AWS_DEFAULT_REGION)
 
-              # Describe the instance to get the public IP and username
-              INSTANCE_INFO=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0]")
-
-              # Extract username and IP
-              INSTANCE_USERNAME=$(echo $INSTANCE_INFO | jq -r ".KeyName")
-              INSTANCE_IP=$(echo $INSTANCE_INFO | jq -r ".PublicIpAddress")
-
-              # Print the information
-              echo "Instance Username: $INSTANCE_USERNAME"
-              echo "Instance IP: $INSTANCE_IP"
+              case "$stack_status" in
+                CREATE_COMPLETE|UPDATE_COMPLETE)
+                  echo "Stack creation/update completed successfully."
+                  break
+                  ;;
+                CREATE_FAILED|ROLLBACK_COMPLETE|ROLLBACK_FAILED|DELETE_COMPLETE|DELETE_FAILED|UPDATE_ROLLBACK_COMPLETE|UPDATE_ROLLBACK_FAILED)
+                  echo "Stack creation/update failed with status: $stack_status"
+                  exit 1
+                  ;;
+                *)
+                  echo "Stack status: $stack_status. Waiting for completion..."
+                  sleep 30  # Adjust the sleep interval as needed
+                  ;;
+              esac
+            done
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
