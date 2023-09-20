@@ -52,6 +52,7 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
       ImageId: ami-053b0d53c279acc90
+      InstanceName: CustOrder-Server
 
 # Define Outputs to retrieve information about the created resources
 Outputs:
