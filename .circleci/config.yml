@@ -188,7 +188,35 @@ jobs:
             SG_ID=#SG_ID
 
             # 4- SSH to the server to deploy
-            ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_PUBLIC_DNS \
+            echo "Setting up SSH..."
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $EC2_PUBLIC_IP >> ~/.ssh/known_hosts
+            ssh -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_PUBLIC_IP << EOF
+              echo "Setting up environment variables..."
+              export SECRET_KEY=$SECRET_KEY
+              export DEBUG=$DEBUG
+              export ALLOWED_HOSTS=$ALLOWED_HOSTS
+              export AT_API_KEY=$AT_API_KEY
+              export AT_USERNAME=$AT_USERNAME
+              export DB_ENGINE=$DB_ENGINE
+              export DB_NAME=$DB_NAME
+              export DB_USER=$DB_USER
+              export DB_PASSWORD=$DB_PASSWORD
+              export DB_HOST=$DB_HOST
+              export DB_PORT=$DB_PORT
+              export DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME
+              export DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL
+              export DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD
+              export DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME
+              export DOCKERHUB_PASS=$DOCKERHUB_PASS
+
+              echo "Starting Docker Compose..."
+              cd App/Django-CustOrder-App-master
+              sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
+              sudo docker-compose -f docker-compose-prod.yml up -d --build
+            EOF
 
 # Define the workflow for the CI/CD pipeline
 workflows:
