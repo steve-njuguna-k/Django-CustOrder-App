@@ -120,7 +120,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker image
-          command: docker build -t $IMAGE_NAME .
+          command: docker-compose -f docker-compose.yml build --tag $IMAGE_NAME .
           # Build a Docker image using the specified IMAGE_NAME
 
       - run:
