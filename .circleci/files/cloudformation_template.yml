@@ -171,7 +171,8 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
 
-          # Append environment variable exports
+          # Append environment variable exports for Django and other settings.
+          # These settings are injected from the CircleCI env variables.
           echo "SECRET_KEY=${SECRETKEY}" >> /etc/environment
           echo "DEBUG=${DEBUG}" >> /etc/environment
           echo "ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> /etc/environment
@@ -189,6 +190,7 @@ Resources:
           echo "DOCKERHUB_USERNAME=${DOCKERHUBUSERNAME}" >> /etc/environment
           echo "DOCKERHUB_PASS=${DOCKERHUBPASS}" >> /etc/environment
 
+          # Export environment variables in the user's bash profile.
           echo "export SECRET_KEY=${SECRETKEY}" >> /home/ubuntu/.bashrc
           echo "export DEBUG=${DEBUG}" >> /home/ubuntu/.bashrc
           echo "export ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> /home/ubuntu/.bashrc
@@ -224,7 +226,7 @@ Resources:
 
           cd Django-CustOrder-App-master/
 
-          touch .env
+          sudo touch .env
           echo "SECRET_KEY=${SECRETKEY}" >> .env
           echo "DEBUG=${DEBUG}" >> .env
           echo "ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> .env
@@ -244,12 +246,11 @@ Resources:
 
           source .env
 
-          DOCKERHUB_USERNAME=$DOCKERHUBUSERNAME
-          DOCKERHUB_PASS=$DOCKERHUBPASS
+          export DOCKERHUB_USERNAME="$DOCKERHUBUSERNAME"
+          export DOCKERHUB_PASS="$DOCKERHUBPASS"
 
           sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
           sudo docker-compose -f docker-compose-prod.yml up -d --build
-
       Tags:
         - Key: Name
           Value: CO-Server

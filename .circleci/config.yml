@@ -159,7 +159,7 @@ jobs:
             aws ssm put-parameter --name dbname --type String --value "$DB_NAME" --overwrite
             aws ssm put-parameter --name dbuser --type String --value "$DB_USER" --overwrite
             aws ssm put-parameter --name dbpassword --type String --value "$DB_PASSWORD" --overwrite
-            aws ssm put-parameter --name dbhost --type String --value "$DB_HOST" --overwrite
+            aws ssm put-parameter --name dbhost --type String --value "$DB_HOST_PROD" --overwrite
             aws ssm put-parameter --name dbport --type String --value "$DB_PORT" --overwrite
             aws ssm put-parameter --name djangosuperuserusername --type String --value "$DJANGO_SUPERUSER_USERNAME" --overwrite
             aws ssm put-parameter --name djangosuperuseremail --type String --value "$DJANGO_SUPERUSER_EMAIL" --overwrite
