@@ -149,8 +149,29 @@ jobs:
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set default.region $AWS_DEFAULT_REGION
 
+            aws ssm put-parameter --name SECRET_KEY --type String --value "$SECRET_KEY"
+            aws ssm put-parameter --name DEBUG --type String --value "$DEBUG"
+            aws ssm put-parameter --name ALLOWED_HOSTS --type String --value "$ALLOWED_HOSTS"
+            aws ssm put-parameter --name AT_API_KEY --type String --value "$AT_API_KEY"
+            aws ssm put-parameter --name AT_USERNAME --type String --value "$AT_USERNAME"
+            aws ssm put-parameter --name DB_ENGINE --type String --value "$DB_ENGINE"
+            aws ssm put-parameter --name DB_NAME --type String --value "$DB_NAME"
+            aws ssm put-parameter --name DB_USER --type String --value "$DB_USER"
+            aws ssm put-parameter --name DB_PASSWORD --type String --value "$DB_PASSWORD"
+            aws ssm put-parameter --name DB_HOST --type String --value "$DB_HOST"
+            aws ssm put-parameter --name DB_PORT --type String --value "$DB_PORT"
+            aws ssm put-parameter --name DJANGO_SUPERUSER_USERNAME --type String --value "$DJANGO_SUPERUSER_USERNAME"
+            aws ssm put-parameter --name DJANGO_SUPERUSER_EMAIL --type String --value "$DJANGO_SUPERUSER_EMAIL"
+            aws ssm put-parameter --name DJANGO_SUPERUSER_PASSWORD --type String --value "$DJANGO_SUPERUSER_PASSWORD"
+            aws ssm put-parameter --name DOCKERHUB_USERNAME --type String --value "$DOCKERHUB_USERNAME"
+            aws ssm put-parameter --name DOCKERHUB_PASS --type String --value "$DOCKERHUB_PASS"
+
             # Deploy the CloudFormation stack
-            aws cloudformation deploy --template-file .circleci/files/cloudformation_template.yml --tags project=$STACK_NAME --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" --parameter SECRET_KEY=$SECRET_KEY DEBUG=$DEBUG ALLOWED_HOSTS=$ALLOWED_HOSTS AT_API_KEY=$AT_API_KEY AT_USERNAME=$AT_USERNAME DB_ENGINE=$DB_ENGINE DB_NAME=$DB_NAME DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD DB_HOST=$DB_HOST DB_PORT=$DB_PORT DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_PASS=$DOCKERHUB_PASS
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudformation_template.yml \
+              --tags project=$STACK_NAME \
+              --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
