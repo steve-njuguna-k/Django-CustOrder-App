@@ -149,22 +149,23 @@ jobs:
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set default.region $AWS_DEFAULT_REGION
 
-            aws ssm put-parameter --name SECRET_KEY --type String --value "$SECRET_KEY" --overwrite
-            aws ssm put-parameter --name DEBUG --type String --value "$DEBUG" --overwrite
-            aws ssm put-parameter --name ALLOWED_HOSTS --type String --value "$ALLOWED_HOSTS" --overwrite
-            aws ssm put-parameter --name AT_API_KEY --type String --value "$AT_API_KEY" --overwrite
-            aws ssm put-parameter --name AT_USERNAME --type String --value "$AT_USERNAME" --overwrite
-            aws ssm put-parameter --name DB_ENGINE --type String --value "$DB_ENGINE" --overwrite
-            aws ssm put-parameter --name DB_NAME --type String --value "$DB_NAME" --overwrite
-            aws ssm put-parameter --name DB_USER --type String --value "$DB_USER" --overwrite
-            aws ssm put-parameter --name DB_PASSWORD --type String --value "$DB_PASSWORD" --overwrite
-            aws ssm put-parameter --name DB_HOST --type String --value "$DB_HOST" --overwrite
-            aws ssm put-parameter --name DB_PORT --type String --value "$DB_PORT" --overwrite
-            aws ssm put-parameter --name DJANGO_SUPERUSER_USERNAME --type String --value "$DJANGO_SUPERUSER_USERNAME" --overwrite
-            aws ssm put-parameter --name DJANGO_SUPERUSER_EMAIL --type String --value "$DJANGO_SUPERUSER_EMAIL" --overwrite
-            aws ssm put-parameter --name DJANGO_SUPERUSER_PASSWORD --type String --value "$DJANGO_SUPERUSER_PASSWORD" --overwrite
-            aws ssm put-parameter --name DOCKERHUB_USERNAME --type String --value "$DOCKERHUB_USERNAME" --overwrite
-            aws ssm put-parameter --name DOCKERHUB_PASS --type String --value "$DOCKERHUB_PASS" --overwrite
+            aws ssm put-parameter --name secretkey --type String --value "$SECRET_KEY" --overwrite
+            aws ssm put-parameter --name debug --type String --value "$DEBUG" --overwrite
+            aws ssm put-parameter --name allowedhosts --type String --value "$ALLOWED_HOSTS" --overwrite
+            aws ssm put-parameter --name atapikey --type String --value "$AT_API_KEY" --overwrite
+            aws ssm put-parameter --name atusername --type String --value "$AT_USERNAME" --overwrite
+            aws ssm put-parameter --name atsmsshortcode --type String --value "$AT_SMS_SHORTCODE" --overwrite
+            aws ssm put-parameter --name dbengine --type String --value "$DB_ENGINE" --overwrite
+            aws ssm put-parameter --name dbname --type String --value "$DB_NAME" --overwrite
+            aws ssm put-parameter --name dbuser --type String --value "$DB_USER" --overwrite
+            aws ssm put-parameter --name dbpassword --type String --value "$DB_PASSWORD" --overwrite
+            aws ssm put-parameter --name dbhost --type String --value "$DB_HOST" --overwrite
+            aws ssm put-parameter --name dbport --type String --value "$DB_PORT" --overwrite
+            aws ssm put-parameter --name djangosuperuserusername --type String --value "$DJANGO_SUPERUSER_USERNAME" --overwrite
+            aws ssm put-parameter --name djangosuperuseremail --type String --value "$DJANGO_SUPERUSER_EMAIL" --overwrite
+            aws ssm put-parameter --name djangosuperuserpassword --type String --value "$DJANGO_SUPERUSER_PASSWORD" --overwrite
+            aws ssm put-parameter --name dockerhubusername --type String --value "$DOCKERHUB_USERNAME" --overwrite
+            aws ssm put-parameter --name dockerhubpass --type String --value "$DOCKERHUB_PASS" --overwrite
 
             # Deploy the CloudFormation stack
             aws cloudformation deploy \

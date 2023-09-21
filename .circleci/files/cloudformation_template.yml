@@ -4,71 +4,71 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   SECRET_KEY:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'SECRET_KEY'
+    Default: 'secretkey'
     Description: Django Secret Key
   DEBUG:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DEBUG'
+    Default: 'debug'
     Description: Django Debug Status
   ALLOWED_HOSTS:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'ALLOWED_HOSTS'
+    Default: 'allowedhosts'
     Description: Django Allowed Hosts
   AT_API_KEY:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'AT_API_KEY'
+    Default: 'atapikey'
     Description: AfricasTalking API Key
   AT_USERNAME:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'AT_USERNAME'
+    Default: 'atusername'
     Description: AfricasTalking Username
   AT_SMS_SHORTCODE:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'AT_SMS_SHORTCODE'
+    Default: 'atsmsshortcode'
     Description: AfricasTalking SMS Shortcode
   DB_ENGINE:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_ENGINE'
+    Default: 'dbengine'
     Description: Django DB Engine
   DB_NAME:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_NAME'
+    Default: 'dbname'
     Description: Django DB Name
   DB_USER:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_USER'
+    Default: 'dbuser'
     Description: Django DB User
   DB_PASSWORD:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_PASSWORD'
+    Default: 'dbpassword'
     Description: Django DB Password
   DB_HOST:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_HOST'
+    Default: 'dbhost'
     Description: Django DB Host
   DB_PORT:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DB_PORT'
+    Default: 'dbport'
     Description: Django DB Port
   DJANGO_SUPERUSER_USERNAME:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DJANGO_SUPERUSER_USERNAME'
+    Default: 'djangosuperuserusername'
     Description: Django SuperUser Username
   DJANGO_SUPERUSER_EMAIL:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DJANGO_SUPERUSER_EMAIL'
+    Default: 'djangosuperuseremail'
     Description: Django SuperUser Email
   DJANGO_SUPERUSER_PASSWORD:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DJANGO_SUPERUSER_PASSWORD'
+    Default: 'djangosuperuserpassword'
     Description: Django SuperUser Password
   DOCKERHUB_USERNAME:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DOCKERHUB_USERNAME'
+    Default: 'dockerhubusername'
     Description: DockerHub Username
   DOCKERHUB_PASS:
     Type: AWS::SSM::Parameter::Value< String>
-    Default: 'DOCKERHUB_PASS'
+    Default: 'dockerhubpass'
     Description: DockerHub Password
 
 # Define AWS resources
