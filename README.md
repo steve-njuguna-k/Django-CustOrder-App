@@ -215,7 +215,7 @@ The EC2 Server
 
 ![](https://github.com/steve-njuguna-k/Django-CustOrder-App/blob/master/Screenshots/EC2-SERVER.png)
 
-Accessing The EC2 Public IP
+Accessing The Application API Endpoint at <AWS_EC2_INSTANCE_PUBLIC_IP>/api
 
 ![](https://github.com/steve-njuguna-k/Django-CustOrder-App/blob/master/Screenshots/AWS-API-ENDPOINT.png)
 
