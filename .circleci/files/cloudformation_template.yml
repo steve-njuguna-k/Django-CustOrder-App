@@ -249,7 +249,7 @@ Resources:
           export DOCKERHUB_USERNAME="$DOCKERHUBUSERNAME"
           export DOCKERHUB_PASS="$DOCKERHUBPASS"
 
-          sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
+          echo "$DOCKERHUB_PASS" | sudo docker login -u "$DOCKERHUB_USERNAME" --password-stdin
           sudo docker-compose -f docker-compose-prod.yml up -d --build
       Tags:
         - Key: Name
