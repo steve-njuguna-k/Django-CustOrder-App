@@ -2,7 +2,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
-  SECRET_KEY:
+  SECRETKEY:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'secretkey'
     Description: Django Secret Key
@@ -10,63 +10,63 @@ Parameters:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'debug'
     Description: Django Debug Status
-  ALLOWED_HOSTS:
+  ALLOWEDHOSTS:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'allowedhosts'
     Description: Django Allowed Hosts
-  AT_API_KEY:
+  ATAPIKEY:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'atapikey'
     Description: AfricasTalking API Key
-  AT_USERNAME:
+  ATUSERNAME:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'atusername'
     Description: AfricasTalking Username
-  AT_SMS_SHORTCODE:
+  ATSMSSHORTCODE:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'atsmsshortcode'
     Description: AfricasTalking SMS Shortcode
-  DB_ENGINE:
+  DBENGINE:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbengine'
     Description: Django DB Engine
-  DB_NAME:
+  DBNAME:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbname'
     Description: Django DB Name
-  DB_USER:
+  DBUSER:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbuser'
     Description: Django DB User
-  DB_PASSWORD:
+  DBPASSWORD:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbpassword'
     Description: Django DB Password
-  DB_HOST:
+  DBHOST:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbhost'
     Description: Django DB Host
-  DB_PORT:
+  DBPORT:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dbport'
     Description: Django DB Port
-  DJANGO_SUPERUSER_USERNAME:
+  DJANGOSUPERUSERUSERNAME:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'djangosuperuserusername'
     Description: Django SuperUser Username
-  DJANGO_SUPERUSER_EMAIL:
+  DJANGOSUPERUSEREMAIL:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'djangosuperuseremail'
     Description: Django SuperUser Email
-  DJANGO_SUPERUSER_PASSWORD:
+  DJANGOSUPERUSERPASSWORD:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'djangosuperuserpassword'
     Description: Django SuperUser Password
-  DOCKERHUB_USERNAME:
+  DOCKERHUBUSERNAME:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dockerhubusername'
     Description: DockerHub Username
-  DOCKERHUB_PASS:
+  DOCKERHUBPASS:
     Type: AWS::SSM::Parameter::Value< String>
     Default: 'dockerhubpass'
     Description: DockerHub Password
@@ -172,39 +172,39 @@ Resources:
           #!/bin/bash
 
           # Append environment variable exports
-          echo "SECRET_KEY=${SECRET_KEY}" >> /etc/environment
+          echo "SECRET_KEY=${SECRETKEY}" >> /etc/environment
           echo "DEBUG=${DEBUG}" >> /etc/environment
-          echo "ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> /etc/environment
-          echo "AT_API_KEY=${AT_API_KEY}" >> /etc/environment
-          echo "AT_USERNAME=${AT_USERNAME}" >> /etc/environment
-          echo "AT_SMS_SHORTCODE=${AT_SMS_SHORTCODE}" >> /etc/environment
-          echo "DB_ENGINE=${DB_ENGINE}" >> /etc/environment
-          echo "DB_NAME=${DB_NAME}" >> /etc/environment
-          echo "DB_USER=${DB_USER}" >> /etc/environment
-          echo "DB_PASSWORD=${DB_PASSWORD}" >> /etc/environment
-          echo "DB_HOST=${DB_HOST}" >> /etc/environment
-          echo "DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}" >> /etc/environment
-          echo "DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}" >> /etc/environment
-          echo "DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}" >> /etc/environment
-          echo "DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}" >> /etc/environment
-          echo "DOCKERHUB_PASS=${DOCKERHUB_PASS}" >> /etc/environment
+          echo "ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> /etc/environment
+          echo "AT_API_KEY=${ATAPIKEY}" >> /etc/environment
+          echo "AT_USERNAME=${ATUSERNAME}" >> /etc/environment
+          echo "AT_SMS_SHORTCODE=${ATSMSSHORTCODE}" >> /etc/environment
+          echo "DB_ENGINE=${DBENGINE}" >> /etc/environment
+          echo "DB_NAME=${DBNAME}" >> /etc/environment
+          echo "DB_USER=${DBUSER}" >> /etc/environment
+          echo "DB_PASSWORD=${DBPASSWORD}" >> /etc/environment
+          echo "DB_HOST=${DBHOST}" >> /etc/environment
+          echo "DJANGO_SUPERUSER_USERNAME=${DJANGOSUPERUSERUSERNAME}" >> /etc/environment
+          echo "DJANGO_SUPERUSER_EMAIL=${DJANGOSUPERUSEREMAIL}" >> /etc/environment
+          echo "DJANGO_SUPERUSER_PASSWORD=${DJANGOSUPERUSERPASSWORD}" >> /etc/environment
+          echo "DOCKERHUB_USERNAME=${DOCKERHUBUSERNAME}" >> /etc/environment
+          echo "DOCKERHUB_PASS=${DOCKERHUBPASS}" >> /etc/environment
 
-          echo "export SECRET_KEY=${SECRET_KEY}" >> /home/ubuntu/.bashrc
+          echo "export SECRET_KEY=${SECRETKEY}" >> /home/ubuntu/.bashrc
           echo "export DEBUG=${DEBUG}" >> /home/ubuntu/.bashrc
-          echo "export ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> /home/ubuntu/.bashrc
-          echo "export AT_API_KEY=${AT_API_KEY}" >> /home/ubuntu/.bashrc
-          echo "export AT_USERNAME=${AT_USERNAME}" >> /home/ubuntu/.bashrc
-          echo "export AT_SMS_SHORTCODE=${AT_SMS_SHORTCODE}" >> /home/ubuntu/.bashrc
-          echo "export DB_ENGINE=${DB_ENGINE}" >> /home/ubuntu/.bashrc
-          echo "export DB_NAME=${DB_NAME}" >> /home/ubuntu/.bashrc
-          echo "export DB_USER=${DB_USER}" >> /home/ubuntu/.bashrc
-          echo "export DB_PASSWORD=${DB_PASSWORD}" >> /home/ubuntu/.bashrc
-          echo "export DB_HOST=${DB_HOST}" >> /home/ubuntu/.bashrc
-          echo "export DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}" >> /home/ubuntu/.bashrc
-          echo "export DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}" >> /home/ubuntu/.bashrc
-          echo "export DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}" >> /home/ubuntu/.bashrc
-          echo "export DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}" >> /home/ubuntu/.bashrc
-          echo "export DOCKERHUB_PASS=${DOCKERHUB_PASS}" >> /home/ubuntu/.bashrc
+          echo "export ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> /home/ubuntu/.bashrc
+          echo "export AT_API_KEY=${ATAPIKEY}" >> /home/ubuntu/.bashrc
+          echo "export AT_USERNAME=${ATUSERNAME}" >> /home/ubuntu/.bashrc
+          echo "export AT_SMS_SHORTCODE=${ATSMSSHORTCODE}" >> /home/ubuntu/.bashrc
+          echo "export DB_ENGINE=${DBENGINE}" >> /home/ubuntu/.bashrc
+          echo "export DB_NAME=${DBNAME}" >> /home/ubuntu/.bashrc
+          echo "export DB_USER=${DBUSER}" >> /home/ubuntu/.bashrc
+          echo "export DB_PASSWORD=${DBPASSWORD}" >> /home/ubuntu/.bashrc
+          echo "export DB_HOST=${DBHOST}" >> /home/ubuntu/.bashrc
+          echo "export DJANGO_SUPERUSER_USERNAME=${DJANGOSUPERUSERUSERNAME}" >> /home/ubuntu/.bashrc
+          echo "export DJANGO_SUPERUSER_EMAIL=${DJANGOSUPERUSEREMAIL}" >> /home/ubuntu/.bashrc
+          echo "export DJANGO_SUPERUSER_PASSWORD=${DJANGOSUPERUSERPASSWORD}" >> /home/ubuntu/.bashrc
+          echo "export DOCKERHUB_USERNAME=${DOCKERHUBUSERNAME}" >> /home/ubuntu/.bashrc
+          echo "export DOCKERHUB_PASS=${DOCKERHUBPASS}" >> /home/ubuntu/.bashrc
 
           # You can also source the .bashrc file to apply the changes immediately
           source /etc/environment
