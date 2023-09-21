@@ -154,23 +154,23 @@ jobs:
               --template-file .circleci/files/cloudformation_template.yml \
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides \
-                  SECRET_KEY: $SECRET_KEY \
-                  DEBUG: $DEBUG \
-                  ALLOWED_HOSTS: $ALLOWED_HOSTS \
-                  AT_API_KEY: $AT_API_KEY \
-                  AT_USERNAME: $AT_USERNAME \
-                  DB_ENGINE: $DB_ENGINE \
-                  DB_NAME: $DB_NAME \
-                  DB_USER: $DB_USER \
-                  DB_PASSWORD: $DB_PASSWORD \
-                  DB_HOST: $DB_HOST \
-                  DB_PORT: $DB_PORT \
-                  DJANGO_SUPERUSER_USERNAME: $DJANGO_SUPERUSER_USERNAME \
-                  DJANGO_SUPERUSER_EMAIL: $DJANGO_SUPERUSER_EMAIL \
-                  DJANGO_SUPERUSER_PASSWORD: $DJANGO_SUPERUSER_PASSWORD \
-                  DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME \
-                  DOCKERHUB_PASS: $DOCKERHUB_PASS
+              --parameter ParameterKey=SECRET_KEY,ParameterValue=$SECRET_KEY \
+                  ParameterKey=SECRET_KEY,ParameterValue=$SECRET_KEY \
+                  ParameterKey=DEBUG,ParameterValue=$DEBUG \
+                  ParameterKey=ALLOWED_HOSTS,ParameterValue=$ALLOWED_HOSTS \
+                  ParameterKey=AT_API_KEY,ParameterValue=$AT_API_KEY \
+                  ParameterKey=AT_USERNAME,ParameterValue=$AT_USERNAME \
+                  ParameterKey=AT_SMS_SHORTCODE,ParameterValue=$AT_SMS_SHORTCODE \
+                  ParameterKey=DB_ENGINE,ParameterValue=$DB_ENGINE \
+                  ParameterKey=DB_NAME,ParameterValue=$DB_NAME \
+                  ParameterKey=DB_USER,ParameterValue=$DB_USER \
+                  ParameterKey=DB_PASSWORD,ParameterValue=$DB_PASSWORD \
+                  ParameterKey=DB_HOST,ParameterValue=$DB_HOST \
+                  ParameterKey=DJANGO_SUPERUSER_USERNAME,ParameterValue=$DJANGO_SUPERUSER_USERNAME \
+                  ParameterKey=DJANGO_SUPERUSER_EMAIL,ParameterValue=$DJANGO_SUPERUSER_EMAIL \
+                  ParameterKey=DJANGO_SUPERUSER_PASSWORD,ParameterValue=$DJANGO_SUPERUSER_PASSWORD \
+                  ParameterKey=DOCKERHUB_USERNAME,ParameterValue=$DOCKERHUB_USERNAME \
+                  ParameterKey=DOCKERHUB_PASS,ParameterValue=$DOCKERHUB_PASS
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
