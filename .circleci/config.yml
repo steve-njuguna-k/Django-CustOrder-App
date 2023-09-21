@@ -154,22 +154,7 @@ jobs:
               --template-file .circleci/files/cloudformation_template.yml \
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter SECRET_KEY=$SECRET_KEY \
-                  DEBUG=$DEBUG \
-                  ALLOWED_HOSTS=$ALLOWED_HOSTS \
-                  AT_API_KEY=$AT_API_KEY \
-                  AT_USERNAME=$AT_USERNAME \
-                  DB_ENGINE=$DB_ENGINE \
-                  DB_NAME=$DB_NAME \
-                  DB_USER=$DB_USER \
-                  DB_PASSWORD=$DB_PASSWORD \
-                  DB_HOST=$DB_HOST \
-                  DB_PORT=$DB_PORT \
-                  DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME \
-                  DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL \
-                  DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD \
-                  DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME \
-                  DOCKERHUB_PASS=$DOCKERHUB_PASS
+              --parameter-overrides SECRET_KEY=$SECRET_KEY DEBUG=$DEBUG ALLOWED_HOSTS=$ALLOWED_HOSTS AT_API_KEY=$AT_API_KEY AT_USERNAME=$AT_USERNAME DB_ENGINE=$DB_ENGINE DB_NAME=$DB_NAME DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD DB_HOST=$DB_HOST DB_PORT=$DB_PORT DJANGO_SUPERUSER_USERNAME=$DJANGO_SUPERUSER_USERNAME DJANGO_SUPERUSER_EMAIL=$DJANGO_SUPERUSER_EMAIL DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_PASS=$DOCKERHUB_PASS \
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
