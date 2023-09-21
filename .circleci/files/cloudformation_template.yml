@@ -223,6 +223,30 @@ Resources:
           sudo rm -rf master.zip
 
           cd Django-CustOrder-App-master/
+
+          touch .env
+          echo "SECRET_KEY=${SECRETKEY}" >> .env
+          echo "DEBUG=${DEBUG}" >> .env
+          echo "ALLOWED_HOSTS=${ALLOWEDHOSTS}" >> .env
+          echo "AT_API_KEY=${ATAPIKEY}" >> .env
+          echo "AT_USERNAME=${ATUSERNAME}" >> .env
+          echo "AT_SMS_SHORTCODE=${ATSMSSHORTCODE}" >> .env
+          echo "DB_ENGINE=${DBENGINE}" >> .env
+          echo "DB_NAME=${DBNAME}" >> .env
+          echo "DB_USER=${DBUSER}" >> .env
+          echo "DB_PASSWORD=${DBPASSWORD}" >> .env
+          echo "DB_HOST=${DBHOST}" >> .env
+          echo "DJANGO_SUPERUSER_USERNAME=${DJANGOSUPERUSERUSERNAME}" >> .env
+          echo "DJANGO_SUPERUSER_EMAIL=${DJANGOSUPERUSEREMAIL}" >> .env
+          echo "DJANGO_SUPERUSER_PASSWORD=${DJANGOSUPERUSERPASSWORD}" >> .env
+          echo "DOCKERHUB_USERNAME=${DOCKERHUBUSERNAME}" >> .env
+          echo "DOCKERHUB_PASS=${DOCKERHUBPASS}" >> .env
+
+          source .env
+
+          DOCKERHUB_USERNAME=$DOCKERHUBUSERNAME
+          DOCKERHUB_PASS=$DOCKERHUBPASS
+
           sudo docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
           sudo docker-compose -f docker-compose-prod.yml up -d --build
 
