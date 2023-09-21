@@ -150,29 +150,11 @@ jobs:
             aws configure set default.region $AWS_DEFAULT_REGION
 
             # Deploy the CloudFormation stack
-            parameters=""
-            parameters="${parameters} ParameterKey=SECRET_KEY,ParameterValue=${SECRET_KEY}"
-            parameters="${parameters} ParameterKey=DEBUG,ParameterValue=${DEBUG}"
-            parameters="${parameters} ParameterKey=ALLOWED_HOSTS,ParameterValue=${ALLOWED_HOSTS}"
-            parameters="${parameters} ParameterKey=AT_API_KEY,ParameterValue=${AT_API_KEY}"
-            parameters="${parameters} ParameterKey=AT_USERNAME,ParameterValue=${AT_USERNAME}"
-            parameters="${parameters} ParameterKey=VPCNDB_ENGINEame,ParameterValue=${DB_ENGINE}"
-            parameters="${parameters} ParameterKey=DB_NAME,ParameterValue=${DB_NAME}"
-            parameters="${parameters} ParameterKey=DB_USER,ParameterValue=${DB_USER}"
-            parameters="${parameters} ParameterKey=DB_PASSWORD,ParameterValue=${DB_PASSWORD}"
-            parameters="${parameters} ParameterKey=DB_HOST,ParameterValue=${DB_HOST}"
-            parameters="${parameters} ParameterKey=DB_PORT,ParameterValue=${DB_PORT}"
-            parameters="${parameters} ParameterKey=DJANGO_SUPERUSER_USERNAME,ParameterValue=${DJANGO_SUPERUSER_USERNAME}"
-            parameters="${parameters} ParameterKey=DJANGO_SUPERUSER_EMAIL,ParameterValue=${DJANGO_SUPERUSER_EMAIL}"
-            parameters="${parameters} ParameterKey=DJANGO_SUPERUSER_PASSWORD,ParameterValue=${DJANGO_SUPERUSER_PASSWORD}"
-            parameters="${parameters} ParameterKey=DOCKERHUB_USERNAME,ParameterValue=${DOCKERHUB_USERNAME}"
-            parameters="${parameters} ParameterKey=DOCKERHUB_PASS,ParameterValue=${DOCKERHUB_PASS}"
-
             aws cloudformation deploy \
               --template-file .circleci/files/cloudformation_template.yml \
               --tags project=$STACK_NAME \
               --stack-name "$STACK_NAME-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter ${parameters}
+              --parameter .circleci/files/parameters.json
       
       - destroy-environment  # Run the destroy-environment command to delete resources
 
