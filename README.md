@@ -72,7 +72,7 @@ The API endpoints provide CRUD functionalities for authenticated & authorized us
 # OpenID Connect Authentication & Authorization
 OpenID Connect (OIDC) is an authentication layer built on top of OAuth 2.0, and it's designed to provide user authentication and identity information to client applications. OIDC extends OAuth 2.0 by adding a standardized way for applications to verify the identity of users and obtain information about them. 
 
-In this project, I used the Django Admin login for authorization. The Django server acts as both the Authorization Server & Resource Server. To create a superuser:
+The Django server acts as both the Authorization Server & Resource Server. To create a superuser:
 ```
 python manage.py createsuperuser
 
@@ -113,7 +113,7 @@ PKCE is important because it addresses security concerns in OAuth 2.0 and OIDC b
 
 ![](https://github.com/steve-njuguna-k/Django-CustOrder-App/blob/master/Screenshots/CODE-VERIFIER-&-CODE-CHALLENGE-GENERATION.png)
 
-To start the Authorization code flow, constructs an authorization request URL as below:
+To start the Authorization code flow, construct an authorization request URL as below:
 ```
 <YOUR_IP_ADDRESS>/o/authorize/?response_type=code&code_challenge=CODE_CHALLENGE&code_challenge_method=S256&client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&scope=openid
 ```
